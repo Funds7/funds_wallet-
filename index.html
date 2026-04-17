@@ -1,9 +1,101 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Test Page</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Demo Wallet</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #0f172a;
+      color: white;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .box {
+      background: #1e293b;
+      padding: 20px;
+      border-radius: 12px;
+      margin-top: 20px;
+    }
+
+    input, button {
+      width: 90%;
+      padding: 12px;
+      margin: 8px 0;
+      border-radius: 8px;
+      border: none;
+    }
+
+    button {
+      background: #22c55e;
+      color: white;
+      font-weight: bold;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
 </head>
 <body>
-  <h1>It is working 🎉</h1>
+
+<h2>💰 Demo Wallet App</h2>
+
+<div id="login" class="box">
+  <h3>Login</h3>
+  <input id="user" placeholder="Username">
+  <input id="pass" type="password" placeholder="Password">
+  <button onclick="login()">Login</button>
+</div>
+
+<div id="app" class="box hidden">
+  <h3>Welcome, <span id="name"></span></h3>
+  <h2>Balance: $<span id="balance">1000</span></h2>
+
+  <input id="sendUser" placeholder="Send to user">
+  <input id="amount" placeholder="Amount">
+
+  <button onclick="send()">Send</button>
+
+  <h4>Transactions</h4>
+  <div id="history"></div>
+
+  <button style="background:red" onclick="logout()">Logout</button>
+</div>
+
+<script>
+let balance = 1000;
+
+function login() {
+  let user = document.getElementById("user").value;
+  if(user === "") return alert("Enter username");
+
+  document.getElementById("login").classList.add("hidden");
+  document.getElementById("app").classList.remove("hidden");
+  document.getElementById("name").innerText = user;
+}
+
+function send() {
+  let user = document.getElementById("sendUser").value;
+  let amount = parseInt(document.getElementById("amount").value);
+
+  if(!user || !amount) return alert("Fill all fields");
+  if(amount > balance) return alert("Not enough balance");
+
+  balance -= amount;
+  document.getElementById("balance").innerText = balance;
+
+  let div = document.createElement("div");
+  div.innerHTML = `Sent $${amount} to ${user}`;
+  document.getElementById("history").appendChild(div);
+}
+
+function logout() {
+  location.reload();
+}
+</script>
+
 </body>
 </html>
