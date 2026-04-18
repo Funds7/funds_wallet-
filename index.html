@@ -1,15 +1,21 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>My Wallet</title>
+  <title>Broker Demo</title>
 </head>
 <body>
 
-<h1>My Wallet</h1>
-<p>Balance: $<span id="balance">900</span></p>
+<h1>Broker Dashboard</h1>
 
-<button onclick="sendMoney()">Send $100</button>
+<h2>Balance: $<span id="balance">1000</span></h2>
 
-<script src="script.js"></script>
+<button onclick="buy()">BUY $100</button>
+<button onclick="sell()">SELL $100</button>
+
+<h3>Trades</h3>
+<ul id="trades"></ul>
+
+<script src="./script.js"></script>
+
 </body>
 </html>
