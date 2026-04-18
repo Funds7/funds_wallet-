@@ -2,52 +2,18 @@ body {
   font-family: Arial;
   background: #0b0f1a;
   color: white;
-  margin: 0;
-  padding: 20px;
+  text-align: center;
 }
 
-h1 {
-  color: #00ffd5;
-}
-
-h2 {
-  color: #00ff88;
+input {
+  padding: 10px;
+  margin: 5px;
+  border-radius: 5px;
+  border: none;
 }
 
 button {
-  padding: 12px 18px;
-  margin: 8px;
-  border: none;
-  border-radius: 10px;
-  font-weight: bold;
+  padding: 10px 15px;
+  margin: 5px;
   cursor: pointer;
-}
-
-button:nth-child(1) {
-  background: #ff4d4d;
-  color: white;
-}
-
-button:nth-child(2) {
-  background: #00ff88;
-  color: black;
-}
-
-button:hover {
-  transform: scale(1.05);
-}
-
-ul {
-  list-style: none;
-  padding: 0;
-  max-width: 400px;
-  margin: auto;
-}
-
-li {
-  background: #151c2e;
-  margin: 6px 0;
-  padding: 10px;
-  border-radius: 8px;
-  font-size: 14px;
 }
