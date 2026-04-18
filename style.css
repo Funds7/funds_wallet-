@@ -1,15 +1,13 @@
 body {
-  font-family: Arial, sans-serif;
+  font-family: Arial;
   background: #0b0f1a;
   color: white;
-  text-align: center;
   margin: 0;
   padding: 20px;
 }
 
 h1 {
   color: #00ffd5;
-  font-size: 28px;
 }
 
 h2 {
@@ -21,13 +19,8 @@ button {
   margin: 8px;
   border: none;
   border-radius: 10px;
-  cursor: pointer;
   font-weight: bold;
-  transition: 0.2s;
-}
-
-button:hover {
-  transform: scale(1.05);
+  cursor: pointer;
 }
 
 button:nth-child(1) {
@@ -36,26 +29,25 @@ button:nth-child(1) {
 }
 
 button:nth-child(2) {
-  background: #4dff88;
+  background: #00ff88;
   color: black;
 }
 
-h3 {
-  margin-top: 30px;
-  color: #ffffff;
+button:hover {
+  transform: scale(1.05);
 }
 
 ul {
   list-style: none;
   padding: 0;
+  max-width: 400px;
+  margin: auto;
 }
 
 li {
   background: #151c2e;
-  margin: 5px auto;
+  margin: 6px 0;
   padding: 10px;
-  width: 300px;
   border-radius: 8px;
   font-size: 14px;
-  border-left: 4px solid #00ff88;
 }
