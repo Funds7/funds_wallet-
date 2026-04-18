@@ -1,19 +1,42 @@
 body {
-  font-family: Arial;
+  margin: 0;
+  font-family: Arial, sans-serif;
   background: #0b0f1a;
   color: white;
-  text-align: center;
 }
 
+/* This fixes the "small app" problem */
+.container {
+  max-width: 420px;
+  margin: auto;
+  min-height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* Inputs */
 input {
-  padding: 10px;
-  margin: 5px;
-  border-radius: 5px;
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border-radius: 8px;
   border: none;
 }
 
+/* Buttons */
 button {
-  padding: 10px 15px;
-  margin: 5px;
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border-radius: 8px;
+  border: none;
   cursor: pointer;
+  background: #1e90ff;
+  color: white;
+  font-weight: bold;
+}
+
+/* Optional: clean headings */
+h1, h2, h3 {
+  text-align: center;
 }
