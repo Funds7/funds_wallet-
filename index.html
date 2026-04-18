@@ -1,35 +1,43 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
+  <!-- THIS is what you were missing -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Broker Demo</title>
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<!-- LOGIN SCREEN -->
-<div id="loginScreen">
-  <h1>Login</h1>
+<div class="container">
 
-  <input id="username" placeholder="Username"><br><br>
-  <input id="password" type="password" placeholder="Password"><br><br>
+  <!-- LOGIN SCREEN -->
+  <div id="loginScreen">
+    <h1>Login</h1>
 
-  <button onclick="login()">Login</button>
-</div>
+    <input id="username" placeholder="Username">
+    <input id="password" type="password" placeholder="Password">
 
-<!-- DASHBOARD -->
-<div id="app" style="display:none;">
-  <h1>Broker Dashboard</h1>
+    <button onclick="login()">Login</button>
+  </div>
 
-  <button onclick="logout()">Logout</button>
+  <!-- DASHBOARD -->
+  <div id="app" style="display:none;">
+    <h1>Broker Dashboard</h1>
 
-  <h2>Balance: $<span id="balance">1000</span></h2>
+    <button onclick="logout()">Logout</button>
 
-  <button onclick="buy()">BUY $100</button>
-  <button onclick="sell()">SELL $100</button>
+    <h2>Balance: $<span id="balance">1000</span></h2>
 
-  <h3>Trades</h3>
-  <ul id="trades"></ul>
+    <button onclick="buy()">BUY $100</button>
+    <button onclick="sell()">SELL $100</button>
+
+    <h3>Trades</h3>
+    <ul id="trades"></ul>
+  </div>
+
 </div>
 
 <script src="./script.js"></script>
