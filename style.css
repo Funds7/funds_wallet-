@@ -30,11 +30,28 @@ h1 {
 }
 
 /* Balance card */
-#app h2 {
-  background: linear-gradient(135deg, #1e90ff33, #00c6ff22);
-  padding: 15px;
-  border-radius: 15px;
-  text-align: center;
+.balance-card {
+  background: linear-gradient(135deg, #1e1e2f, #2b2b4a);
+  padding: 20px;
+  border-radius: 20px;
+  color: white;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+.balance-card h4 {
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+.balance-card h1 {
+  font-size: 32px;
+  margin: 10px 0;
+}
+
+.profit {
+  color: #00ff9d;
+  font-size: 14px;
+}
 }
 
 /* Inputs */
