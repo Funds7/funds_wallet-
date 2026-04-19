@@ -11,12 +11,13 @@ function login() {
 }
 
 // ===================== DASHBOARD =====================
-let user = localStorage.getItem("user");
+window.addEventListener("load", () => {
 
-if(document.getElementById("balance")) {
+  let user = localStorage.getItem("user");
 
   if(!user){
     window.location.href = "index.html";
+    return;
   }
 
   document.getElementById("user").innerText = user;
@@ -117,4 +118,5 @@ if(document.getElementById("balance")) {
   // ===== RUN PRICES =====
   loadPrices();
   setInterval(loadPrices, 10000);
-}
+
+});
