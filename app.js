@@ -1,4 +1,3 @@
-// LOGIN
 function login() {
   let user = document.getElementById("username").value;
   let pass = document.getElementById("password").value;
@@ -11,15 +10,25 @@ function login() {
   }
 }
 
-// DASHBOARD
+// ===================== DASHBOARD =====================
 let user = localStorage.getItem("user");
 
-if(window.location.pathname.includes("dashboard")) {
-  if(!user) window.location.href = "index.html";
+// safer check (NOT relying on URL)
+if(document.getElementById("balance")) {
+
+  if(!user){
+    window.location.href = "index.html";
+  }
 
   document.getElementById("user").innerText = user;
 
-  let balance = localStorage.getItem(user+"_balance") || 1000;
+  // SAFE BALANCE FIX (prevents NaN)
+  let balance = localStorage.getItem(user+"_balance");
+
+  if(balance === null || balance === "undefined" || isNaN(balance)){
+    balance = 1000;
+  }
+
   balance = parseFloat(balance);
 
   document.getElementById("balance").innerText = balance;
@@ -28,9 +37,24 @@ if(window.location.pathname.includes("dashboard")) {
     localStorage.setItem(user+"_balance", balance);
   }
 
+  function addHistory(text){
+    let li = document.createElement("li");
+    li.innerText = text;
+    document.getElementById("history").appendChild(li);
+  }
+
   window.buy = function(){
     let amt = parseFloat(document.getElementById("amount").value);
-    if(amt > balance) return alert("Not enough balance");
+
+    if(isNaN(amt) || amt <= 0){
+      alert("Enter valid amount");
+      return;
+    }
+
+    if(amt > balance){
+      alert("Not enough balance");
+      return;
+    }
 
     balance -= amt;
     document.getElementById("balance").innerText = balance;
@@ -42,6 +66,11 @@ if(window.location.pathname.includes("dashboard")) {
   window.sell = function(){
     let amt = parseFloat(document.getElementById("amount").value);
 
+    if(isNaN(amt) || amt <= 0){
+      alert("Enter valid amount");
+      return;
+    }
+
     balance += amt;
     document.getElementById("balance").innerText = balance;
 
@@ -52,11 +81,5 @@ if(window.location.pathname.includes("dashboard")) {
   window.logout = function(){
     localStorage.removeItem("user");
     window.location.href = "index.html";
-  }
-
-  function addHistory(text){
-    let li = document.createElement("li");
-    li.innerText = text;
-    document.getElementById("history").appendChild(li);
   }
 }
