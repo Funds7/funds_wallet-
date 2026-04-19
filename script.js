@@ -1,6 +1,27 @@
+let balance = 1000;
+let position = 0; // how much asset user holds
+let entryPrice = 0;
+
+// Simulated market price
+let price = 100;
+
+// start price movement
+setInterval(() => {
+  let change = (Math.random() - 0.5) * 2; // random up/down
+  price += change;
+
+  if (price < 1) price = 1;
+
+  updateMarketUI();
+  updateBalance();
+}, 2000);
+
 function login() {
   document.getElementById("loginScreen").style.display = "none";
   document.getElementById("app").style.display = "block";
+
+  updateBalance();
+  updateMarketUI();
 }
 
 function logout() {
@@ -8,30 +29,49 @@ function logout() {
   document.getElementById("app").style.display = "none";
 }
 
-let balance = 1000;
-
-function updateBalance() {
-  document.querySelector(".balance-card h1").innerText = "$" + balance.toFixed(2);
-}
-
+// BUY = enter position at current price
 function buy() {
-  let amount = 50;
-  balance -= amount;
+  if (balance <= 0) return;
 
-  addTrade("BUY", amount);
+  position = 1;
+  entryPrice = price;
+
+  addTrade("BUY", price);
   updateBalance();
 }
 
+// SELL = close position
 function sell() {
-  let amount = 50;
-  balance += amount;
+  if (position === 0) return;
 
-  addTrade("SELL", amount);
+  let profit = (price - entryPrice) * 10; // multiplier effect
+  balance += profit;
+
+  addTrade("SELL", price + " | P/L: $" + profit.toFixed(2));
+
+  position = 0;
+  entryPrice = 0;
+
   updateBalance();
 }
 
-function addTrade(type, amount) {
+// update balance display
+function updateBalance() {
+  document.querySelector(".balance-card h1").innerText =
+    "$" + balance.toFixed(2);
+}
+
+// show live market price
+function updateMarketUI() {
+  document.querySelector(".profit").innerText =
+    "Market Price: $" + price.toFixed(2);
+}
+
+// trade history
+function addTrade(type, info) {
   let li = document.createElement("li");
-  li.innerText = type + " $" + amount + " - " + new Date().toLocaleTimeString();
+  li.innerText =
+    type + " → " + info + " - " + new Date().toLocaleTimeString();
+
   document.getElementById("trades").appendChild(li);
 }
