@@ -1,50 +1,92 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Broker Demo</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Pro Wallet</title>
+  <style>
+    body {
+      background: #0f172a;
+      color: white;
+      font-family: Arial;
+      text-align: center;
+    }
+    .card {
+      background: #1e293b;
+      padding: 20px;
+      margin: 20px;
+      border-radius: 10px;
+    }
+    button {
+      padding: 10px;
+      margin: 5px;
+      background: #22c55e;
+      border: none;
+      color: white;
+      border-radius: 5px;
+    }
+    input {
+      padding: 10px;
+      margin: 5px;
+    }
+  </style>
 </head>
 
 <body>
 
-<div class="container">
+<h1>💰 Pro Wallet + Trading</h1>
 
-  <!-- LOGIN SCREEN -->
-  <div id="loginScreen">
-
-    <h1>Login</h1>
-
-    <input placeholder="Username">
-    <input type="password" placeholder="Password">
-
-    <button onclick="login()">Login</button>
-
-  </div>
-
-  <!-- DASHBOARD -->
-  <div id="app" style="display:none; padding:20px;">
-
-    <div class="balance-card" style="margin-bottom:20px;">
-      <h4>Total Balance</h4>
-      <h1>$1,000.00</h1>
-      <p class="profit">Market Price: <span id="price">$100.00</span></p>
-    </div>
-
-    <div class="trade-buttons">
-  <button style="background:#00c853;" onclick="buy()">BUY</button>
-  <button style="background:#ff3d00;" onclick="sell()">SELL</button>
-    </div>
-
-    <h3>Trades</h3>
-    <ul id="trades"></ul>
-
-  </div>
-
+<div class="card">
+  <h2>Balance: $<span id="balance">1000</span></h2>
 </div>
 
-<script src="./script.js"></script>
+<div class="card">
+  <h3>Trade</h3>
+  <input type="number" id="amount" placeholder="Enter amount">
+  <br>
+  <button onclick="buy()">Buy</button>
+  <button onclick="sell()">Sell</button>
+</div>
+
+<div class="card">
+  <h3>History</h3>
+  <ul id="history"></ul>
+</div>
+
+<script>
+let balance = localStorage.getItem("balance") || 1000;
+balance = parseFloat(balance);
+document.getElementById("balance").innerText = balance;
+
+function save() {
+  localStorage.setItem("balance", balance);
+}
+
+function addHistory(text) {
+  let li = document.createElement("li");
+  li.innerText = text;
+  document.getElementById("history").appendChild(li);
+}
+
+function buy() {
+  let amount = parseFloat(document.getElementById("amount").value);
+  if (amount > balance) return alert("Not enough balance");
+
+  balance -= amount;
+  document.getElementById("balance").innerText = balance;
+  addHistory("BUY: $" + amount);
+
+  save();
+}
+
+function sell() {
+  let amount = parseFloat(document.getElementById("amount").value);
+
+  balance += amount;
+  document.getElementById("balance").innerText = balance;
+  addHistory("SELL: $" + amount);
+
+  save();
+}
+</script>
 
 </body>
 </html>
