@@ -52,4 +52,61 @@ button {
 /* Headings */
 h1, h2, h3 {
   text-align: center;
+}/* Top bar */
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Balance card */
+.balance-card {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(15px);
+  text-align: center;
+}
+
+.balance-card h1 {
+  font-size: 32px;
+  margin: 10px 0;
+}
+
+/* Buttons row */
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.actions button {
+  flex: 1;
+}
+
+.buy {
+  background: #00c853;
+}
+
+.sell {
+  background: #ff3d00;
+}
+
+/* Trades */
+.trades-section {
+  margin-top: 20px;
+}
+
+#trades {
+  list-style: none;
+  padding: 0;
+}
+
+#trades li {
+  background: rgba(255,255,255,0.05);
+  margin-top: 8px;
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 14px;
 }
