@@ -32,8 +32,10 @@
 
     <h2>Balance: $<span id="balance">1000</span></h2>
 
-    <button onclick="buy()">BUY $100</button>
-    <button onclick="sell()">SELL $100</button>
+    <div style="display:flex; gap:10px;">
+  <button style="background:#00c853;" onclick="buy()">BUY</button>
+  <button style="background:#ff3d00;" onclick="sell()">SELL</button>
+    </div>
 
     <h3>Trades</h3>
     <ul id="trades"></ul>
