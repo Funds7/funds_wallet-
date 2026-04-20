@@ -30,15 +30,12 @@ window.addEventListener("load", () => {
   let btc = parseFloat(localStorage.getItem(user + "_btc")) || 0;
   let eth = parseFloat(localStorage.getItem(user + "_eth")) || 0;
 
-  let storedInitial = localStorage.getItem(user + "_initial");
-  let initial;
+  let initial = parseFloat(localStorage.getItem(user + "_initial"));
 
-  if (storedInitial === null || storedInitial === undefined || isNaN(parseFloat(storedInitial))) {
-    initial = usd;
-    localStorage.setItem(user + "_initial", initial);
-  } else {
-    initial = parseFloat(storedInitial);
-  }
+if (isNaN(initial)) {
+  initial = 1000;
+  localStorage.setItem(user + "_initial", initial);
+}
 
   // ===== TRADE COOLDOWN =====
   let lastTradeTime = 0;
