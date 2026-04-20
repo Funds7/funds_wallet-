@@ -67,16 +67,19 @@ function updatePrices() {
 
 // ================= PORTFOLIO SAFE =================
 function updatePortfolio() {
-  let usd = Number(localStorage.getItem("usd") || 0);
-  let btc = Number(localStorage.getItem("btc") || 0);
-  let eth = Number(localStorage.getItem("eth") || 0);
+  let usd = Number(localStorage.getItem("usd")) || 0;
+  let btc = Number(localStorage.getItem("btc")) || 0;
+  let eth = Number(localStorage.getItem("eth")) || 0;
 
-  let total = usd + btc * prices.BTC + eth * prices.ETH;
+  let btcPrice = Number(prices.BTC) || 0;
+  let ethPrice = Number(prices.ETH) || 0;
+
+  let total = usd + (btc * btcPrice) + (eth * ethPrice);
 
   if (!isFinite(total)) total = 0;
 
   document.getElementById("balance").innerText = usd.toFixed(2);
-  document.getElementById("btcHold").innerText = btc.toFixed(6);
+  document.getElementById("btcHold").innerText = btc.toFixed(8);
   document.getElementById("ethHold").innerText = eth.toFixed(6);
   document.getElementById("totalValue").innerText = total.toFixed(2);
 }
