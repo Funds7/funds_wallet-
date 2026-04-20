@@ -2,50 +2,38 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>ProWallet 3.5 Stable</title>
+<title>ProWallet 4.0 Exchange</title>
 
 <style>
 body{
   margin:0;
   font-family:Arial;
-  background:#0b0f1a;
+  background:#0a0f1c;
   color:#fff;
 }
 
 header{
-  padding:15px;
-  background:#11182a;
+  padding:12px;
+  background:#111a2e;
   display:flex;
   justify-content:space-between;
   align-items:center;
 }
 
-button{
-  padding:8px 12px;
-  border:none;
-  cursor:pointer;
-  border-radius:5px;
-}
-
-.container{
-  display:flex;
-}
+.container{display:flex;}
 
 .sidebar{
-  width:220px;
-  background:#121a2e;
+  width:200px;
+  background:#0f1628;
   height:100vh;
   padding:10px;
 }
 
-.main{
-  flex:1;
-  padding:15px;
-}
+.main{flex:1;padding:15px;}
 
 .card{
-  background:#161f35;
-  padding:15px;
+  background:#151f38;
+  padding:12px;
   margin:10px 0;
   border-radius:10px;
 }
@@ -56,11 +44,31 @@ input{
   margin:5px 0;
 }
 
-.chatBox{
+button{
+  padding:8px 10px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+}
+
+.green{color:#00ff9d;}
+.red{color:#ff4d4d;}
+
+table{
+  width:100%;
+  font-size:12px;
+  border-collapse:collapse;
+}
+
+td,th{
+  padding:5px;
+  border-bottom:1px solid #222;
+}
+
+canvas{
+  background:#0b1220;
+  width:100%;
   height:200px;
-  overflow:auto;
-  background:#0f1628;
-  padding:10px;
   border-radius:10px;
 }
 </style>
@@ -68,19 +76,19 @@ input{
 
 <body>
 
-<!-- LOGIN SCREEN -->
+<!-- LOGIN -->
 <div id="loginPage" style="padding:40px;">
-  <h2>ProWallet Login</h2>
+  <h2>ProWallet 4.0 Login</h2>
   <input id="username" placeholder="Username"><br>
   <input id="password" type="password" placeholder="Password"><br>
   <button onclick="login()">Login</button>
 </div>
 
-<!-- DASHBOARD -->
+<!-- APP -->
 <div id="app" style="display:none;">
 
 <header>
-  <div>⚡ ProWallet 3.5</div>
+  <div>⚡ ProWallet 4.0 Exchange</div>
   <div>
     User: <span id="user"></span>
     <button onclick="logout()">Logout</button>
@@ -89,192 +97,223 @@ input{
 
 <div class="container">
 
-  <div class="sidebar">
-    <h3>Menu</h3>
-    <p>Dashboard</p>
-    <p>Trade</p>
-    <p>Market Chat</p>
-  </div>
+<div class="sidebar">
+  <h3>Menu</h3>
+  <p>Dashboard</p>
+  <p>Trade</p>
+  <p>Chart</p>
+  <p>History</p>
+</div>
 
-  <div class="main">
+<div class="main">
 
-    <!-- PRICES -->
-    <div class="card">
-      <h3>Live Prices</h3>
-      <div id="btcPrice"></div>
-      <div id="ethPrice"></div>
-    </div>
+<!-- PRICE -->
+<div class="card">
+  <h3>Live BTC</h3>
+  <div id="price">BTC: $0</div>
+  <div id="pl" class="green">P/L: $0</div>
+</div>
 
-    <!-- BALANCE -->
-    <div class="card">
-      <h3>Portfolio</h3>
-      Balance: $<span id="balance">0</span><br>
-      BTC: <span id="btcHold">0</span><br>
-      ETH: <span id="ethHold">0</span><br>
-      Total: $<span id="totalValue">0</span>
-    </div>
+<!-- CHART -->
+<div class="card">
+  <h3>Market Chart</h3>
+  <canvas id="chart"></canvas>
+</div>
 
-    <!-- TRADE -->
-    <div class="card">
-      <h3>Trade BTC</h3>
-      <input id="amount" placeholder="Amount USD">
-      <button onclick="buy()">BUY</button>
-      <button onclick="sell()">SELL</button>
-    </div>
+<!-- TRADE -->
+<div class="card">
+  <h3>Trade BTC</h3>
+  <input id="amount" placeholder="USD amount">
+  <button onclick="buy()">BUY</button>
+  <button onclick="sell()">SELL</button>
+</div>
 
-    <!-- CHAT -->
-    <div class="card">
-      <h3>Market Chat</h3>
-      <div class="chatBox" id="chat"></div>
-      <input id="msg" placeholder="Type message">
-      <button onclick="sendMsg()">Send</button>
-    </div>
+<!-- PORTFOLIO -->
+<div class="card">
+  <h3>Portfolio</h3>
+  USD: $<span id="usd">0</span><br>
+  BTC: <span id="btc">0</span><br>
+  Total: $<span id="total">0</span>
+</div>
 
-  </div>
+<!-- ORDER BOOK -->
+<div class="card">
+  <h3>Order History</h3>
+  <table id="history"></table>
+</div>
+
+</div>
 </div>
 
 <script>
+
+// ================= STATE =================
+let price = 76000;
+let prices = [];
+let interval;
+let entryPrice = 76000;
+
 // ================= LOGIN =================
 function login(){
-  let u = document.getElementById("username").value;
-  let p = document.getElementById("password").value;
+  let u=document.getElementById("username").value;
+  let p=document.getElementById("password").value;
+  if(!u||!p) return alert("Enter details");
 
-  if(!u || !p){
-    alert("Enter login details");
-    return;
-  }
+  localStorage.setItem("user",u);
 
-  localStorage.setItem("user", u);
-
-  // INIT SAFE WALLET
   if(!localStorage.getItem("usd")){
-    localStorage.setItem("usd", "1000");
-    localStorage.setItem("btc", "0");
-    localStorage.setItem("eth", "0");
+    localStorage.setItem("usd","1000");
+    localStorage.setItem("btc","0");
   }
 
+  show();
+}
+
+// ================= SHOW =================
+function show(){
   document.getElementById("loginPage").style.display="none";
   document.getElementById("app").style.display="block";
 
-  init();
+  document.getElementById("user").innerText=
+    localStorage.getItem("user");
+
+  clearInterval(interval);
+  interval=setInterval(update,2000);
+
+  update();
 }
 
-// ================= INIT =================
-let prices = {BTC:76000, ETH:2300};
-
-function init(){
-  document.getElementById("user").innerText =
-    localStorage.getItem("user") || "Guest";
-
-  setInterval(updatePrices, 4000);
-  setInterval(updatePortfolio, 2000);
-  updatePortfolio();
-  loadChat();
-}
-
-// ================= LOGOUT FIX =================
+// ================= LOGOUT =================
 function logout(){
   localStorage.clear();
   location.reload();
 }
 
-// ================= PRICES =================
-function updatePrices(){
-  prices.BTC += (Math.random()-0.5)*300;
-  prices.ETH += (Math.random()-0.5)*20;
+// ================= PRICE ENGINE =================
+function update(){
+  price += (Math.random()-0.5)*300;
+  price = Math.max(1000,price);
 
-  document.getElementById("btcPrice").innerText =
-    "BTC: $" + prices.BTC.toFixed(2);
+  prices.push(price);
+  if(prices.length>30) prices.shift();
 
-  document.getElementById("ethPrice").innerText =
-    "ETH: $" + prices.ETH.toFixed(2);
+  document.getElementById("price").innerText =
+    "BTC: $" + price.toFixed(2);
+
+  drawChart();
+  portfolio();
 }
 
-// ================= PORTFOLIO (NO NaN FIX) =================
-function updatePortfolio(){
+// ================= PORTFOLIO =================
+function portfolio(){
+  let usd=Number(localStorage.getItem("usd")||0);
+  let btc=Number(localStorage.getItem("btc")||0);
 
-  let usd = parseFloat(localStorage.getItem("usd")) || 0;
-  let btc = parseFloat(localStorage.getItem("btc")) || 0;
-  let eth = parseFloat(localStorage.getItem("eth")) || 0;
+  let total = usd + btc*price;
 
-  let total =
-    usd +
-    btc * prices.BTC +
-    eth * prices.ETH;
+  let pl = (price - entryPrice) * btc;
 
-  if(isNaN(total)) total = 0;
+  document.getElementById("usd").innerText=usd.toFixed(2);
+  document.getElementById("btc").innerText=btc.toFixed(6);
+  document.getElementById("total").innerText=total.toFixed(2);
 
-  document.getElementById("balance").innerText = usd.toFixed(2);
-  document.getElementById("btcHold").innerText = btc;
-  document.getElementById("ethHold").innerText = eth;
-  document.getElementById("totalValue").innerText = total.toFixed(2);
+  let plEl=document.getElementById("pl");
+  plEl.innerText="P/L: $"+pl.toFixed(2);
+  plEl.className = pl>=0 ? "green":"red";
 }
 
 // ================= TRADE =================
 function buy(){
-  let amt = parseFloat(document.getElementById("amount").value);
-  if(!amt || amt <= 0) return;
+  let amt=Number(document.getElementById("amount").value);
+  if(!amt) return;
 
-  let usd = parseFloat(localStorage.getItem("usd")) || 0;
-  let btc = parseFloat(localStorage.getItem("btc")) || 0;
+  let usd=Number(localStorage.getItem("usd")||0);
+  let btc=Number(localStorage.getItem("btc")||0);
 
-  if(amt > usd){
-    alert("Not enough USD");
-    return;
-  }
+  if(amt>usd) return alert("Not enough USD");
 
-  usd -= amt;
-  btc += amt / prices.BTC;
+  usd-=amt;
+  btc+=amt/price;
 
-  localStorage.setItem("usd", usd);
-  localStorage.setItem("btc", btc);
+  entryPrice=price;
 
-  updatePortfolio();
+  localStorage.setItem("usd",usd);
+  localStorage.setItem("btc",btc);
+
+  addHistory("BUY",amt);
 }
 
+// SELL
 function sell(){
-  let amt = parseFloat(document.getElementById("amount").value);
-  if(!amt || amt <= 0) return;
+  let amt=Number(document.getElementById("amount").value);
+  if(!amt) return;
 
-  let btc = parseFloat(localStorage.getItem("btc")) || 0;
-  let usd = parseFloat(localStorage.getItem("usd")) || 0;
+  let usd=Number(localStorage.getItem("usd")||0);
+  let btc=Number(localStorage.getItem("btc")||0);
 
-  let btcAmt = amt / prices.BTC;
+  let b=amt/price;
+  if(b>btc) return alert("Not enough BTC");
 
-  if(btcAmt > btc){
-    alert("Not enough BTC");
-    return;
-  }
+  btc-=b;
+  usd+=amt;
 
-  btc -= btcAmt;
-  usd += amt;
+  localStorage.setItem("usd",usd);
+  localStorage.setItem("btc",btc);
 
-  localStorage.setItem("btc", btc);
-  localStorage.setItem("usd", usd);
-
-  updatePortfolio();
+  addHistory("SELL",amt);
 }
 
-// ================= CHAT =================
-function sendMsg(){
-  let msg = document.getElementById("msg").value;
-  if(!msg) return;
+// ================= HISTORY =================
+function addHistory(type,amt){
+  let h=JSON.parse(localStorage.getItem("h")||"[]");
+  h.unshift({type,amt,price:price.toFixed(2),time:new Date().toLocaleTimeString()});
+  if(h.length>10) h.pop();
 
-  let chat = JSON.parse(localStorage.getItem("chat") || "[]");
-  chat.push(msg);
-
-  localStorage.setItem("chat", JSON.stringify(chat));
-  document.getElementById("msg").value = "";
-
-  loadChat();
+  localStorage.setItem("h",JSON.stringify(h));
+  renderHistory();
 }
 
-function loadChat(){
-  let chat = JSON.parse(localStorage.getItem("chat") || "[]");
-  let box = document.getElementById("chat");
-
-  box.innerHTML = chat.map(m => "💬 " + m).join("<br>");
+function renderHistory(){
+  let h=JSON.parse(localStorage.getItem("h")||"[]");
+  document.getElementById("history").innerHTML=
+    "<tr><th>Type</th><th>Amt</th><th>Price</th><th>Time</th></tr>"+
+    h.map(x=>
+      `<tr>
+        <td>${x.type}</td>
+        <td>${x.amt}</td>
+        <td>${x.price}</td>
+        <td>${x.time}</td>
+      </tr>`
+    ).join("");
 }
+
+// ================= CHART =================
+function drawChart(){
+  let c=document.getElementById("chart");
+  let ctx=c.getContext("2d");
+
+  c.width=c.clientWidth;
+  c.height=200;
+
+  ctx.clearRect(0,0,c.width,c.height);
+
+  ctx.beginPath();
+  ctx.strokeStyle="#00ffcc";
+
+  let max=Math.max(...prices);
+  let min=Math.min(...prices);
+
+  prices.forEach((p,i)=>{
+    let x=(i/prices.length)*c.width;
+    let y=c.height-((p-min)/(max-min))*c.height;
+
+    if(i===0) ctx.moveTo(x,y);
+    else ctx.lineTo(x,y);
+  });
+
+  ctx.stroke();
+}
+
 </script>
 
 </body>
