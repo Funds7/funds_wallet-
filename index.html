@@ -15,9 +15,7 @@ body{
 
 .hidden{display:none;}
 
-.container{
-  padding:20px;
-}
+.container{padding:20px;}
 
 .card{
   background:#121a2a;
@@ -38,7 +36,24 @@ input{
   padding:10px;
   margin:5px;
   width:90%;
+  border-radius:5px;
+  border:none;
 }
+
+#chatBox{
+  height:200px;
+  overflow-y:auto;
+  background:#0f1626;
+  padding:10px;
+  border-radius:10px;
+  margin-bottom:10px;
+  font-size:14px;
+}
+.msg{
+  margin:5px 0;
+}
+.me{color:#4dd0e1;}
+.other{color:#ffb74d;}
 </style>
 </head>
 
@@ -54,18 +69,20 @@ input{
   <button onclick="login()">Login</button>
 </div>
 
-<!-- ================= DASHBOARD ================= -->
+<!-- ================= APP ================= -->
 <div id="app" class="container hidden">
 
   <h2>ProWallet</h2>
   <button onclick="logout()">Logout</button>
 
+  <!-- LIVE PRICES -->
   <div class="card">
     <h3>Live Prices</h3>
     BTC: $<span id="btcPrice"></span><br/>
     ETH: $<span id="ethPrice"></span>
   </div>
 
+  <!-- WALLET -->
   <div class="card">
     <h3>Wallet</h3>
     Balance: $<span id="usdBalance"></span><br/>
@@ -74,22 +91,34 @@ input{
     P/L: <span id="pl"></span>
   </div>
 
+  <!-- TRADE -->
   <div class="card">
     <h3>Trade</h3>
     <input id="tradeAmount" placeholder="Amount in USD"/>
-
     <button onclick="buy()">BUY</button>
     <button onclick="sell()">SELL</button>
   </div>
 
+  <!-- TRADE HISTORY -->
   <div class="card">
     <h3>Trade History</h3>
     <div id="tradeHistory"></div>
   </div>
 
+  <!-- 💬 LIVE CHAT -->
+  <div class="card">
+    <h3>Live Chat</h3>
+
+    <div id="chatBox"></div>
+
+    <input id="chatInput" placeholder="Type message..." />
+    <button onclick="sendMessage()">Send</button>
+  </div>
+
 </div>
 
 <script>
+
 // ================= STATE =================
 let state = JSON.parse(localStorage.getItem("wallet")) || {
   loggedIn:false,
@@ -97,7 +126,8 @@ let state = JSON.parse(localStorage.getItem("wallet")) || {
   btcHoldings:0,
   btcPrice:76000,
   ethPrice:2300,
-  trades:[]
+  trades:[],
+  chat:[]
 };
 
 const START = 1000;
@@ -115,11 +145,12 @@ function login(){
   if(!u || !p) return alert("Enter details");
 
   state.loggedIn = true;
+  state.username = u;
+
   save();
   showApp();
 }
 
-// ================= LOGOUT =================
 function logout(){
   state.loggedIn = false;
   save();
@@ -144,10 +175,10 @@ function updatePrices(){
   state.ethPrice += (Math.random()-0.5)*10;
 }
 
-// ================= BUY =================
+// ================= TRADE =================
 function buy(){
   let amt = parseFloat(document.getElementById("tradeAmount").value);
-  if(!amt || amt <= 0) return;
+  if(!amt) return;
 
   if(amt > state.usdBalance) return alert("Not enough USD");
 
@@ -156,20 +187,15 @@ function buy(){
   state.usdBalance -= amt;
   state.btcHoldings += btc;
 
-  state.trades.unshift({
-    type:"BUY",
-    amt,
-    time:new Date().toLocaleTimeString()
-  });
+  state.trades.unshift({type:"BUY", amt, time:new Date().toLocaleTimeString()});
 
   save();
   render();
 }
 
-// ================= SELL =================
 function sell(){
   let amt = parseFloat(document.getElementById("tradeAmount").value);
-  if(!amt || amt <= 0) return;
+  if(!amt) return;
 
   let btc = amt / state.btcPrice;
 
@@ -178,17 +204,13 @@ function sell(){
   state.usdBalance += amt;
   state.btcHoldings -= btc;
 
-  state.trades.unshift({
-    type:"SELL",
-    amt,
-    time:new Date().toLocaleTimeString()
-  });
+  state.trades.unshift({type:"SELL", amt, time:new Date().toLocaleTimeString()});
 
   save();
   render();
 }
 
-// ================= PORTFOLIO =================
+// ================= WALLET =================
 function totalValue(){
   return state.usdBalance + (state.btcHoldings * state.btcPrice);
 }
@@ -197,6 +219,42 @@ function pl(){
   let diff = totalValue() - START;
   let pct = (diff/START)*100;
   return `${diff.toFixed(2)} (${pct.toFixed(2)}%)`;
+}
+
+// ================= CHAT =================
+function sendMessage(){
+  let msg = document.getElementById("chatInput").value;
+  if(!msg) return;
+
+  state.chat.push({
+    user: state.username || "Me",
+    msg,
+    time: new Date().toLocaleTimeString()
+  });
+
+  document.getElementById("chatInput").value = "";
+  save();
+  renderChat();
+}
+
+// fake live replies (simulation)
+function botReply(){
+  const replies = [
+    "Nice trade 🔥",
+    "BTC looking strong 📈",
+    "Be careful with volatility ⚠️",
+    "Good entry point 👍",
+    "Market is moving fast 🚀"
+  ];
+
+  state.chat.push({
+    user:"Bot",
+    msg: replies[Math.floor(Math.random()*replies.length)],
+    time:new Date().toLocaleTimeString()
+  });
+
+  save();
+  renderChat();
 }
 
 // ================= RENDER =================
@@ -220,13 +278,36 @@ function render(){
     h.appendChild(div);
   });
 
+  renderChat();
   save();
+}
+
+// ================= CHAT RENDER =================
+function renderChat(){
+  let box = document.getElementById("chatBox");
+  box.innerHTML = "";
+
+  state.chat.slice(-20).forEach(c=>{
+    let div = document.createElement("div");
+    div.className = "msg " + (c.user === state.username ? "me" : "other");
+    div.innerText = `${c.user}: ${c.msg} (${c.time})`;
+    box.appendChild(div);
+  });
+
+  box.scrollTop = box.scrollHeight;
 }
 
 // ================= LOOP =================
 setInterval(()=>{
   updatePrices();
-  if(state.loggedIn) render();
+  if(state.loggedIn){
+    render();
+
+    // random bot chat
+    if(Math.random() < 0.3){
+      botReply();
+    }
+  }
 },3000);
 
 // ================= INIT =================
@@ -235,6 +316,7 @@ if(state.loggedIn){
 }else{
   showLogin();
 }
+
 </script>
 
 </body>
