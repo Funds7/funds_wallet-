@@ -14,21 +14,21 @@ window.addEventListener("load", () => {
 
   let user = localStorage.getItem("user");
 
-  if(!user){
-    window.location.href = "index.html";
-    return;
-  }
+if(!user){
+  window.location.href = "index.html";
+  return;
+}
 
-  document.getElementById("user").innerText = user;
+document.getElementById("user").innerText = user;
 
-  // ===== LOAD DATA =====
-  let usd = parseFloat(localStorage.getItem(user+"_usd")) || 1000;
-  let btc = parseFloat(localStorage.getItem(user+"_btc")) || 0;
-  let eth = parseFloat(localStorage.getItem(user+"_eth")) || 0;
+// ===== LOAD DATA =====
+let usd = parseFloat(localStorage.getItem(user+"_usd")) || 1000;
+let btc = parseFloat(localStorage.getItem(user+"_btc")) || 0;
+let eth = parseFloat(localStorage.getItem(user+"_eth")) || 0;
 
 let initial = parseFloat(localStorage.getItem(user+"_initial"));
 
-if (isNaN(initial)) {
+if(isNaN(initial)){
   initial = usd;
   localStorage.setItem(user+"_initial", initial);
 }
