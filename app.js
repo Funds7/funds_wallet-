@@ -187,6 +187,10 @@ window.addEventListener("load", () => {
   };
 
   // ===== START =====
-  loadPrices();
-  setInterval(loadPrices, 10000);
+updateUI();
+updatePL();
+
+loadPrices();
+setTimeout(loadPrices, 500); // optional fast refresh
+setInterval(loadPrices, 10000);
 });
