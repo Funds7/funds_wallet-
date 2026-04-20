@@ -1,97 +1,206 @@
-<!DOCTYPE html>
-<html lang="en">
-
+<!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Pro Wallet Dashboard</title>
-  <link rel="stylesheet" href="style.css">
-</head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ProWallet 3.5 QuickSurf</title>  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>  <style>
+    body{
+      margin:0;
+      font-family:Arial, sans-serif;
+      background:#0b0f1a;
+      color:#fff;
+    }
 
-<body>
+    .hidden{display:none;}
 
-<div class="layout">
+    .center{
+      height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex-direction:column;
+    }
 
-  <!-- SIDEBAR -->
-  <div class="sidebar">
-    <h2>⚡ ProWallet</h2>
+    input{
+      padding:10px;
+      margin:5px;
+      border-radius:8px;
+      border:none;
+      width:200px;
+    }
 
-    <p>User: <span id="user">-</span></p>
+    button{
+      padding:10px 15px;
+      border:none;
+      border-radius:8px;
+      cursor:pointer;
+      margin:5px;
+    }
 
-    <button onclick="logout()">Logout</button>
-  </div>
+    .btn-green{background:#2ecc71;color:#fff;}
+    .btn-red{background:#e74c3c;color:#fff;}
 
-  <!-- MAIN -->
-  <div class="main">
+    .layout{
+      display:flex;
+    }
 
-    <!-- LIVE PRICES -->
-    <div class="card">
-      <h3>Live Crypto Prices</h3>
+    .sidebar{
+      width:220px;
+      background:#111827;
+      padding:15px;
+      height:100vh;
+    }
 
-      <p>BTC: $<span id="btc">loading...</span></p>
-      <p>ETH: $<span id="eth">loading...</span></p>
+    .main{
+      flex:1;
+      padding:15px;
+    }
 
-      <p id="lastUpdate">Last Update: --</p>
-    </div>
-
-    <!-- CHART -->
-    <div class="card">
-      <h3>Market Chart (BTC/USD)</h3>
-
-      <div id="chartContainer"></div>
-    </div>
-
-    <!-- TOP CARDS -->
-    <div class="grid">
-
-      <div class="card">
-        <h3>Balance (USD)</h3>
-        <h1>$<span id="balance">0</span></h1>
-      </div>
-
-      <div class="card">
-        <h3>Portfolio</h3>
-
-        <p>USD: $<span id="usd">0</span></p>
-        <p>BTC: <span id="btc_hold">0</span></p>
-        <p>ETH: <span id="eth_hold">0</span></p>
-
-        <h3>Total Value: $<span id="total">0</span></h3>
-
-        <p id="pl">P/L: $0 (0%)</p>
-      </div>
-
-      <div class="card">
-        <h3>Market Status</h3>
-        <p>Live Demo Trading</p>
-      </div>
-
-    </div>
-
-    <!-- TRADE -->
-    <div class="card trade">
-      <h3>Trade BTC</h3>
-
-      <input id="amount" type="number" placeholder="Enter amount in USD">
-
-      <div class="buttons">
-        <button class="buy" onclick="buy()">BUY</button>
-        <button class="sell" onclick="sell()">SELL</button>
-      </div>
-    </div>
-
-    <!-- HISTORY -->
-    <div class="card">
-      <h3>Trade History</h3>
-      <ul id="history"></ul>
-    </div>
-
-  </div>
+    .card{
+      background:#111827;
+      padding:15px;
+      border-radius:10px;
+      margin-bottom:15px;
+    }
+  </style></head><body><!-- LOGIN PAGE --><div id="loginPage" class="center">
+  <h2>⚡ ProWallet Login</h2>
+  <input id="username" placeholder="Username" />
+  <input id="password" type="password" placeholder="Password" />
+  <button class="btn-green" onclick="login()">Login</button>
+</div><!-- DASHBOARD --><div id="dashboard" class="layout hidden">  <div class="sidebar">
+    <h2>⚡ ProWallet 3.5</h2>
+    <p>User: <span id="userDisplay"></span></p>
+    <button class="btn-red" onclick="logout()">Logout</button>
+  </div>  <div class="main"><div class="card">
+  <h3>Live Crypto Prices</h3>
+  <p>BTC: <span id="btc">loading...</span></p>
+  <p>ETH: <span id="eth">loading...</span></p>
+  <p>Last Update: <span id="time">--</span></p>
 </div>
 
-<!-- TRADINGVIEW -->
-<script src="https://s3.tradingview.com/tv.js"></script>
+<div class="card">
+  <h3>Market Chart (BTC/USD)</h3>
+  <canvas id="chart"></canvas>
+</div>
 
-<script src="script.js"></script>
+<div class="card">
+  <h3>Balance</h3>
+  <p>$<span id="balance">1000</span></p>
+</div>
 
-</body>
+<div class="card">
+  <h3>Trade BTC</h3>
+  <input id="amount" placeholder="Enter USD amount" />
+  <button class="btn-green" onclick="buy()">BUY</button>
+  <button class="btn-red" onclick="sell()">SELL</button>
+</div>
+
+  </div>
+</div><script>
+
+let balance = 1000;
+let btcPrice = 0;
+let chart;
+let prices = [];
+
+// LOGIN
+function login(){
+  let user = document.getElementById("username").value;
+  let pass = document.getElementById("password").value;
+
+  if(user && pass){
+    localStorage.setItem("user", user);
+    showDashboard();
+  }
+}
+
+// LOGOUT FIXED
+function logout(){
+  localStorage.removeItem("user");
+  location.reload();
+}
+
+function showDashboard(){
+  document.getElementById("loginPage").classList.add("hidden");
+  document.getElementById("dashboard").classList.remove("hidden");
+
+  document.getElementById("userDisplay").innerText = localStorage.getItem("user");
+
+  initChart();
+  loadPrices();
+  setInterval(loadPrices, 8000);
+}
+
+// AUTO CHECK LOGIN
+window.onload = () => {
+  if(localStorage.getItem("user")){
+    showDashboard();
+  }
+}
+
+// PRICES
+async function loadPrices(){
+  try{
+    let res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd");
+    let data = await res.json();
+
+    btcPrice = data.bitcoin.usd;
+
+    document.getElementById("btc").innerText = "$" + btcPrice;
+    document.getElementById("eth").innerText = "$" + data.ethereum.usd;
+    document.getElementById("time").innerText = new Date().toLocaleTimeString();
+
+    updateChart(btcPrice);
+
+  }catch(e){
+    console.log("API error", e);
+  }
+}
+
+// CHART
+function initChart(){
+  const ctx = document.getElementById("chart").getContext("2d");
+
+  chart = new Chart(ctx, {
+    type:"line",
+    data:{
+      labels:[],
+      datasets:[{
+        label:"BTC/USD",
+        data:[],
+        borderColor:"#00ffcc",
+        fill:false
+      }]
+    }
+  });
+}
+
+function updateChart(price){
+  if(!chart) return;
+
+  prices.push(price);
+  if(prices.length > 20) prices.shift();
+
+  chart.data.labels = prices.map((_,i)=>i);
+  chart.data.datasets[0].data = prices;
+  chart.update();
+}
+
+// TRADING
+function buy(){
+  let amt = Number(document.getElementById("amount").value);
+  if(!amt) return;
+
+  balance -= amt;
+  document.getElementById("balance").innerText = balance.toFixed(2);
+}
+
+function sell(){
+  let amt = Number(document.getElementById("amount").value);
+  if(!amt) return;
+
+  balance += amt;
+  document.getElementById("balance").innerText = balance.toFixed(2);
+}
+
+</script></body>
 </html>
