@@ -119,12 +119,26 @@ li {
 .card p {
   font-size: 16px;
   color: #bbb;
-}/* ===== LIVE PRICE ANIMATION ===== */
+}
+
+/* ===== LIVE PRICE ANIMATION ===== */
 .flash-up {
-  animation: flash 0.3s ease;
+  animation: flash 0.5s ease;
+  display: inline-block;
 }
 
 @keyframes flash {
-  0% { color: #00ff88; transform: scale(1.1); }
-  100% { color: inherit; transform: scale(1); }
+  0% {
+    color: #00ff88;
+    transform: scale(1.15);
+    text-shadow: 0 0 10px #00ff88;
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    color: inherit;
+    transform: scale(1);
+    text-shadow: none;
+  }
 }
