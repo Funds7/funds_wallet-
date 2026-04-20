@@ -1,206 +1,281 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ProWallet 3.5 QuickSurf</title>  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>  <style>
-    body{
-      margin:0;
-      font-family:Arial, sans-serif;
-      background:#0b0f1a;
-      color:#fff;
-    }
+<meta charset="UTF-8">
+<title>ProWallet 3.5 Stable</title>
 
-    .hidden{display:none;}
-
-    .center{
-      height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      flex-direction:column;
-    }
-
-    input{
-      padding:10px;
-      margin:5px;
-      border-radius:8px;
-      border:none;
-      width:200px;
-    }
-
-    button{
-      padding:10px 15px;
-      border:none;
-      border-radius:8px;
-      cursor:pointer;
-      margin:5px;
-    }
-
-    .btn-green{background:#2ecc71;color:#fff;}
-    .btn-red{background:#e74c3c;color:#fff;}
-
-    .layout{
-      display:flex;
-    }
-
-    .sidebar{
-      width:220px;
-      background:#111827;
-      padding:15px;
-      height:100vh;
-    }
-
-    .main{
-      flex:1;
-      padding:15px;
-    }
-
-    .card{
-      background:#111827;
-      padding:15px;
-      border-radius:10px;
-      margin-bottom:15px;
-    }
-  </style></head><body><!-- LOGIN PAGE --><div id="loginPage" class="center">
-  <h2>⚡ ProWallet Login</h2>
-  <input id="username" placeholder="Username" />
-  <input id="password" type="password" placeholder="Password" />
-  <button class="btn-green" onclick="login()">Login</button>
-</div><!-- DASHBOARD --><div id="dashboard" class="layout hidden">  <div class="sidebar">
-    <h2>⚡ ProWallet 3.5</h2>
-    <p>User: <span id="userDisplay"></span></p>
-    <button class="btn-red" onclick="logout()">Logout</button>
-  </div>  <div class="main"><div class="card">
-  <h3>Live Crypto Prices</h3>
-  <p>BTC: <span id="btc">loading...</span></p>
-  <p>ETH: <span id="eth">loading...</span></p>
-  <p>Last Update: <span id="time">--</span></p>
-</div>
-
-<div class="card">
-  <h3>Market Chart (BTC/USD)</h3>
-  <canvas id="chart"></canvas>
-</div>
-
-<div class="card">
-  <h3>Balance</h3>
-  <p>$<span id="balance">1000</span></p>
-</div>
-
-<div class="card">
-  <h3>Trade BTC</h3>
-  <input id="amount" placeholder="Enter USD amount" />
-  <button class="btn-green" onclick="buy()">BUY</button>
-  <button class="btn-red" onclick="sell()">SELL</button>
-</div>
-
-  </div>
-</div><script>
-
-let balance = 1000;
-let btcPrice = 0;
-let chart;
-let prices = [];
-
-// LOGIN
-function login(){
-  let user = document.getElementById("username").value;
-  let pass = document.getElementById("password").value;
-
-  if(user && pass){
-    localStorage.setItem("user", user);
-    showDashboard();
-  }
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:#0b0f1a;
+  color:#fff;
 }
 
-// LOGOUT FIXED
+header{
+  padding:15px;
+  background:#11182a;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+button{
+  padding:8px 12px;
+  border:none;
+  cursor:pointer;
+  border-radius:5px;
+}
+
+.container{
+  display:flex;
+}
+
+.sidebar{
+  width:220px;
+  background:#121a2e;
+  height:100vh;
+  padding:10px;
+}
+
+.main{
+  flex:1;
+  padding:15px;
+}
+
+.card{
+  background:#161f35;
+  padding:15px;
+  margin:10px 0;
+  border-radius:10px;
+}
+
+input{
+  padding:8px;
+  width:90%;
+  margin:5px 0;
+}
+
+.chatBox{
+  height:200px;
+  overflow:auto;
+  background:#0f1628;
+  padding:10px;
+  border-radius:10px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="loginPage" style="padding:40px;">
+  <h2>ProWallet Login</h2>
+  <input id="username" placeholder="Username"><br>
+  <input id="password" type="password" placeholder="Password"><br>
+  <button onclick="login()">Login</button>
+</div>
+
+<!-- DASHBOARD -->
+<div id="app" style="display:none;">
+
+<header>
+  <div>⚡ ProWallet 3.5</div>
+  <div>
+    User: <span id="user"></span>
+    <button onclick="logout()">Logout</button>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="sidebar">
+    <h3>Menu</h3>
+    <p>Dashboard</p>
+    <p>Trade</p>
+    <p>Market Chat</p>
+  </div>
+
+  <div class="main">
+
+    <!-- PRICES -->
+    <div class="card">
+      <h3>Live Prices</h3>
+      <div id="btcPrice"></div>
+      <div id="ethPrice"></div>
+    </div>
+
+    <!-- BALANCE -->
+    <div class="card">
+      <h3>Portfolio</h3>
+      Balance: $<span id="balance">0</span><br>
+      BTC: <span id="btcHold">0</span><br>
+      ETH: <span id="ethHold">0</span><br>
+      Total: $<span id="totalValue">0</span>
+    </div>
+
+    <!-- TRADE -->
+    <div class="card">
+      <h3>Trade BTC</h3>
+      <input id="amount" placeholder="Amount USD">
+      <button onclick="buy()">BUY</button>
+      <button onclick="sell()">SELL</button>
+    </div>
+
+    <!-- CHAT -->
+    <div class="card">
+      <h3>Market Chat</h3>
+      <div class="chatBox" id="chat"></div>
+      <input id="msg" placeholder="Type message">
+      <button onclick="sendMsg()">Send</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ================= LOGIN =================
+function login(){
+  let u = document.getElementById("username").value;
+  let p = document.getElementById("password").value;
+
+  if(!u || !p){
+    alert("Enter login details");
+    return;
+  }
+
+  localStorage.setItem("user", u);
+
+  // INIT SAFE WALLET
+  if(!localStorage.getItem("usd")){
+    localStorage.setItem("usd", "1000");
+    localStorage.setItem("btc", "0");
+    localStorage.setItem("eth", "0");
+  }
+
+  document.getElementById("loginPage").style.display="none";
+  document.getElementById("app").style.display="block";
+
+  init();
+}
+
+// ================= INIT =================
+let prices = {BTC:76000, ETH:2300};
+
+function init(){
+  document.getElementById("user").innerText =
+    localStorage.getItem("user") || "Guest";
+
+  setInterval(updatePrices, 4000);
+  setInterval(updatePortfolio, 2000);
+  updatePortfolio();
+  loadChat();
+}
+
+// ================= LOGOUT FIX =================
 function logout(){
-  localStorage.removeItem("user");
+  localStorage.clear();
   location.reload();
 }
 
-function showDashboard(){
-  document.getElementById("loginPage").classList.add("hidden");
-  document.getElementById("dashboard").classList.remove("hidden");
+// ================= PRICES =================
+function updatePrices(){
+  prices.BTC += (Math.random()-0.5)*300;
+  prices.ETH += (Math.random()-0.5)*20;
 
-  document.getElementById("userDisplay").innerText = localStorage.getItem("user");
+  document.getElementById("btcPrice").innerText =
+    "BTC: $" + prices.BTC.toFixed(2);
 
-  initChart();
-  loadPrices();
-  setInterval(loadPrices, 8000);
+  document.getElementById("ethPrice").innerText =
+    "ETH: $" + prices.ETH.toFixed(2);
 }
 
-// AUTO CHECK LOGIN
-window.onload = () => {
-  if(localStorage.getItem("user")){
-    showDashboard();
-  }
+// ================= PORTFOLIO (NO NaN FIX) =================
+function updatePortfolio(){
+
+  let usd = parseFloat(localStorage.getItem("usd")) || 0;
+  let btc = parseFloat(localStorage.getItem("btc")) || 0;
+  let eth = parseFloat(localStorage.getItem("eth")) || 0;
+
+  let total =
+    usd +
+    btc * prices.BTC +
+    eth * prices.ETH;
+
+  if(isNaN(total)) total = 0;
+
+  document.getElementById("balance").innerText = usd.toFixed(2);
+  document.getElementById("btcHold").innerText = btc;
+  document.getElementById("ethHold").innerText = eth;
+  document.getElementById("totalValue").innerText = total.toFixed(2);
 }
 
-// PRICES
-async function loadPrices(){
-  try{
-    let res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd");
-    let data = await res.json();
-
-    btcPrice = data.bitcoin.usd;
-
-    document.getElementById("btc").innerText = "$" + btcPrice;
-    document.getElementById("eth").innerText = "$" + data.ethereum.usd;
-    document.getElementById("time").innerText = new Date().toLocaleTimeString();
-
-    updateChart(btcPrice);
-
-  }catch(e){
-    console.log("API error", e);
-  }
-}
-
-// CHART
-function initChart(){
-  const ctx = document.getElementById("chart").getContext("2d");
-
-  chart = new Chart(ctx, {
-    type:"line",
-    data:{
-      labels:[],
-      datasets:[{
-        label:"BTC/USD",
-        data:[],
-        borderColor:"#00ffcc",
-        fill:false
-      }]
-    }
-  });
-}
-
-function updateChart(price){
-  if(!chart) return;
-
-  prices.push(price);
-  if(prices.length > 20) prices.shift();
-
-  chart.data.labels = prices.map((_,i)=>i);
-  chart.data.datasets[0].data = prices;
-  chart.update();
-}
-
-// TRADING
+// ================= TRADE =================
 function buy(){
-  let amt = Number(document.getElementById("amount").value);
-  if(!amt) return;
+  let amt = parseFloat(document.getElementById("amount").value);
+  if(!amt || amt <= 0) return;
 
-  balance -= amt;
-  document.getElementById("balance").innerText = balance.toFixed(2);
+  let usd = parseFloat(localStorage.getItem("usd")) || 0;
+  let btc = parseFloat(localStorage.getItem("btc")) || 0;
+
+  if(amt > usd){
+    alert("Not enough USD");
+    return;
+  }
+
+  usd -= amt;
+  btc += amt / prices.BTC;
+
+  localStorage.setItem("usd", usd);
+  localStorage.setItem("btc", btc);
+
+  updatePortfolio();
 }
 
 function sell(){
-  let amt = Number(document.getElementById("amount").value);
-  if(!amt) return;
+  let amt = parseFloat(document.getElementById("amount").value);
+  if(!amt || amt <= 0) return;
 
-  balance += amt;
-  document.getElementById("balance").innerText = balance.toFixed(2);
+  let btc = parseFloat(localStorage.getItem("btc")) || 0;
+  let usd = parseFloat(localStorage.getItem("usd")) || 0;
+
+  let btcAmt = amt / prices.BTC;
+
+  if(btcAmt > btc){
+    alert("Not enough BTC");
+    return;
+  }
+
+  btc -= btcAmt;
+  usd += amt;
+
+  localStorage.setItem("btc", btc);
+  localStorage.setItem("usd", usd);
+
+  updatePortfolio();
 }
 
-</script></body>
+// ================= CHAT =================
+function sendMsg(){
+  let msg = document.getElementById("msg").value;
+  if(!msg) return;
+
+  let chat = JSON.parse(localStorage.getItem("chat") || "[]");
+  chat.push(msg);
+
+  localStorage.setItem("chat", JSON.stringify(chat));
+  document.getElementById("msg").value = "";
+
+  loadChat();
+}
+
+function loadChat(){
+  let chat = JSON.parse(localStorage.getItem("chat") || "[]");
+  let box = document.getElementById("chat");
+
+  box.innerHTML = chat.map(m => "💬 " + m).join("<br>");
+}
+</script>
+
+</body>
 </html>
