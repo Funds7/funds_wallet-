@@ -1,3 +1,5 @@
+console.log("PROWALLET SCRIPT ACTIVE");
+
 let prices = { BTC: 76000, ETH: 2300 };
 let priceInterval, portfolioInterval;
 
