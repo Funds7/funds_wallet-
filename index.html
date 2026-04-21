@@ -2,57 +2,134 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>ProWallet 5.0</title>
+<title>ProWallet 6.0</title>
 
 <style>
 body{
   margin:0;
   font-family:Arial;
-  background:#0a0f1c;
+  background:#0b0e11;
+  color:#eaecef;
+}
+
+/* HEADER */
+header{
+  background:#161a1e;
+  padding:12px 20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border-bottom:1px solid #222;
+}
+
+/* LAYOUT */
+.container{display:flex;}
+
+.sidebar{
+  width:220px;
+  background:#0b0e11;
+  border-right:1px solid #222;
+  padding:20px;
+}
+
+.sidebar h2{
+  color:#f0b90b;
+}
+
+.sidebar p{
+  padding:10px 0;
+  color:#aaa;
+  cursor:pointer;
+}
+
+.sidebar p:hover{
   color:#fff;
 }
 
-header{
-  padding:12px;
-  background:#111a2e;
-  display:flex;
-  justify-content:space-between;
+/* MAIN */
+.main{
+  flex:1;
+  padding:20px;
 }
 
-.container{display:flex;}
-.sidebar{
-  width:200px;
-  background:#0f1628;
-  height:100vh;
-  padding:10px;
+/* CARDS */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:15px;
 }
-
-.main{flex:1;padding:15px;}
 
 .card{
-  background:#151f38;
-  padding:12px;
-  margin:10px 0;
+  background:#161a1e;
+  padding:15px;
   border-radius:10px;
+  box-shadow:0 0 10px rgba(0,0,0,0.3);
 }
 
-input,button{
-  padding:8px;
-  margin:5px 0;
-  border-radius:6px;
+/* PRICE */
+.price{
+  font-size:28px;
+  font-weight:bold;
+  color:#f0b90b;
+}
+
+.green{color:#0ecb81;}
+.red{color:#f6465d;}
+
+/* INPUTS */
+input{
+  width:100%;
+  padding:10px;
+  margin-top:10px;
   border:none;
+  border-radius:6px;
+  background:#0b0e11;
+  color:#fff;
 }
 
-button{cursor:pointer}
+/* BUTTONS */
+button{
+  width:48%;
+  padding:10px;
+  margin-top:10px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+  font-weight:bold;
+}
 
-.green{color:#00ff9d}
-.red{color:#ff4d4d}
+.buy{background:#0ecb81;color:#000;}
+.sell{background:#f6465d;color:#fff;}
 
+button:hover{opacity:0.8;}
+
+/* CHART */
 canvas{
   width:100%;
   height:200px;
-  background:#0b1220;
+  background:#0b0e11;
   border-radius:10px;
+}
+
+/* LOGIN */
+#loginPage{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  height:100vh;
+}
+
+.login-box{
+  background:#161a1e;
+  padding:30px;
+  border-radius:10px;
+  width:300px;
+}
+
+.login-box h2{
+  text-align:center;
+  margin-bottom:20px;
 }
 </style>
 </head>
@@ -60,39 +137,48 @@ canvas{
 <body>
 
 <!-- LOGIN -->
-<div id="loginPage" style="padding:40px;">
-  <h2>ProWallet 5.0 Login</h2>
-  <input id="username" placeholder="Username"><br>
-  <input id="password" type="password" placeholder="Password"><br>
-  <button onclick="login()">Login</button>
+<div id="loginPage">
+  <div class="login-box">
+    <h2>⚡ ProWallet</h2>
+    <input id="username" placeholder="Username">
+    <input id="password" type="password" placeholder="Password">
+    <button style="width:100%" onclick="login()">Login</button>
+  </div>
 </div>
 
 <!-- APP -->
 <div id="app" style="display:none;">
 
 <header>
-  <div>⚡ ProWallet 5.0</div>
+  <div>⚡ ProWallet Exchange</div>
   <div>
-    User: <span id="user"></span>
+    <span id="user"></span>
     <button onclick="logout()">Logout</button>
   </div>
 </header>
 
 <div class="container">
 
+<!-- SIDEBAR -->
 <div class="sidebar">
+  <h2>Market</h2>
   <p>Dashboard</p>
   <p>Trade</p>
-  <p>Chart</p>
+  <p>Portfolio</p>
 </div>
 
+<!-- MAIN -->
 <div class="main">
 
+<div class="grid">
+
+<!-- PRICE -->
 <div class="card">
-  <h3>BTC Price</h3>
-  <div id="price">0</div>
+  <div>BTC/USDT</div>
+  <div id="price" class="price">$0</div>
 </div>
 
+<!-- PORTFOLIO -->
 <div class="card">
   <h3>Portfolio</h3>
   USD: $<span id="usd">0</span><br>
@@ -100,18 +186,24 @@ canvas{
   Total: $<span id="total">0</span>
 </div>
 
+<!-- TRADE -->
 <div class="card">
   <h3>Trade</h3>
   <input id="amount" placeholder="USD amount">
-  <button onclick="buy()">BUY</button>
-  <button onclick="sell()">SELL</button>
+
+  <div style="display:flex; justify-content:space-between;">
+    <button class="buy" onclick="buy()">BUY</button>
+    <button class="sell" onclick="sell()">SELL</button>
+  </div>
 </div>
 
+<!-- CHART -->
 <div class="card">
   <h3>Chart</h3>
   <canvas id="chart"></canvas>
 </div>
 
+<!-- HISTORY -->
 <div class="card">
   <h3>History</h3>
   <div id="history"></div>
@@ -120,24 +212,22 @@ canvas{
 </div>
 </div>
 
-<script>
+</div>
 
-console.log("PROWALLET 5.0 ACTIVE");
+<script>
 
 let price = 76000;
 let chartData = [];
 let interval;
 
-// ================= LOAD =================
+// LOAD
 window.addEventListener("load", () => {
   if(localStorage.getItem("user")){
     showApp();
-  } else {
-    document.getElementById("loginPage").style.display="block";
   }
 });
 
-// ================= LOGIN =================
+// LOGIN
 function login(){
   let u=document.getElementById("username").value;
   if(!u) return alert("Enter username");
@@ -152,12 +242,12 @@ function login(){
   showApp();
 }
 
-// ================= SHOW =================
+// SHOW
 function showApp(){
   document.getElementById("loginPage").style.display="none";
   document.getElementById("app").style.display="block";
 
-  document.getElementById("user").innerText=
+  document.getElementById("user").innerText =
     localStorage.getItem("user");
 
   clearInterval(interval);
@@ -166,30 +256,22 @@ function showApp(){
   update();
 }
 
-// ================= LOGOUT =================
+// LOGOUT
 function logout(){
-  // clear ONLY session data (not everything needed for stability)
   localStorage.removeItem("user");
-  
-  // reset intervals safely
-  if (interval) clearInterval(interval);
+  clearInterval(interval);
 
-  // force UI reset instead of full reload glitch
-  document.getElementById("app").style.display = "none";
-  document.getElementById("loginPage").style.display = "block";
-
-  // optional: clear inputs
-  document.getElementById("username").value = "";
-  document.getElementById("password").value = "";
+  document.getElementById("app").style.display="none";
+  document.getElementById("loginPage").style.display="flex";
 }
 
-// ================= MARKET =================
+// MARKET
 function update(){
-  price += (Math.random()-0.5)*250;
+  price += (Math.random()-0.5)*200;
   price = Math.max(1000,price);
 
   chartData.push(price);
-  if(chartData.length>25) chartData.shift();
+  if(chartData.length>30) chartData.shift();
 
   document.getElementById("price").innerText =
     "$"+price.toFixed(2);
@@ -198,7 +280,7 @@ function update(){
   drawChart();
 }
 
-// ================= PORTFOLIO =================
+// PORTFOLIO
 function portfolio(){
   let usd=Number(localStorage.getItem("usd")||0);
   let btc=Number(localStorage.getItem("btc")||0);
@@ -210,7 +292,7 @@ function portfolio(){
   document.getElementById("total").innerText=total.toFixed(2);
 }
 
-// ================= TRADE =================
+// TRADE
 function buy(){
   let amt=Number(document.getElementById("amount").value);
   if(!amt) return;
@@ -248,11 +330,11 @@ function sell(){
   addHistory("SELL",amt);
 }
 
-// ================= HISTORY =================
+// HISTORY
 function addHistory(type,amt){
   let h=JSON.parse(localStorage.getItem("h")||"[]");
   h.unshift({type,amt,price:price.toFixed(2)});
-  if(h.length>8) h.pop();
+  if(h.length>10) h.pop();
 
   localStorage.setItem("h",JSON.stringify(h));
   renderHistory();
@@ -261,10 +343,10 @@ function addHistory(type,amt){
 function renderHistory(){
   let h=JSON.parse(localStorage.getItem("h")||"[]");
   document.getElementById("history").innerHTML =
-    h.map(x=>`${x.type} $${x.amt} @ ${x.price}`).join("<br>");
+    h.map(x=>`<div>${x.type} $${x.amt} @ ${x.price}</div>`).join("");
 }
 
-// ================= CHART =================
+// CHART
 function drawChart(){
   let c=document.getElementById("chart");
   let ctx=c.getContext("2d");
@@ -286,7 +368,7 @@ function drawChart(){
     else ctx.lineTo(x,y);
   });
 
-  ctx.strokeStyle="#00ffcc";
+  ctx.strokeStyle="#f0b90b";
   ctx.stroke();
 }
 
