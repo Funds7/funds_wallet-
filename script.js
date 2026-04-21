@@ -1,12 +1,23 @@
 document.getElementById("user").innerText =
   localStorage.getItem("user") || "Guest";
 
-const ws = new WebSocket("ws://localhost:3000");
+const priceEl = document.getElementById("price");
+
+// FIXED WebSocket connection
+const ws = new WebSocket(`ws://${window.location.host}`);
+
+ws.onopen = () => {
+  console.log("WebSocket connected");
+};
 
 ws.onmessage = (event) => {
   const data = JSON.parse(event.data);
 
   if (data.type === "price") {
-    document.getElementById("price").innerText = "$" + data.price;
+    priceEl.innerText = "$" + data.price;
   }
+};
+
+ws.onerror = () => {
+  priceEl.innerText = "Connection error";
 };
