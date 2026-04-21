@@ -168,8 +168,19 @@ function showApp(){
 
 // ================= LOGOUT =================
 function logout(){
+  // clear ONLY session data (not everything needed for stability)
   localStorage.removeItem("user");
-  location.reload();
+  
+  // reset intervals safely
+  if (interval) clearInterval(interval);
+
+  // force UI reset instead of full reload glitch
+  document.getElementById("app").style.display = "none";
+  document.getElementById("loginPage").style.display = "block";
+
+  // optional: clear inputs
+  document.getElementById("username").value = "";
+  document.getElementById("password").value = "";
 }
 
 // ================= MARKET =================
