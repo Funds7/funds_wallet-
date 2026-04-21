@@ -1,17 +1,15 @@
 <!DOCTYPE html><html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>ProWallet Pro (Binance Level)</title><style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ProWallet Exchange (Pro Level)</title>
+<style>
 body{
   margin:0;
   font-family:Arial, sans-serif;
   background:#0b0e11;
   color:#eaecef;
-  overflow-x:hidden;
 }
-
-/* TOP BAR */
 header{
   display:flex;
   justify-content:space-between;
@@ -20,148 +18,68 @@ header{
   background:#161a1e;
   border-bottom:1px solid #222;
 }
-
-.logo{
-  color:#f0b90b;
-  font-weight:bold;
-  letter-spacing:1px;
-}
-
-/* LAYOUT */
-.container{
-  display:flex;
-}
-
+.container{display:flex; height:calc(100vh - 60px);}
 .sidebar{
   width:220px;
   background:#0b0e11;
   border-right:1px solid #222;
-  padding:15px;
+  padding:20px;
 }
-
-.sidebar h3{
-  color:#f0b90b;
-}
-
-.sidebar p{
-  padding:10px;
-  cursor:pointer;
-  color:#aaa;
-  border-radius:6px;
-}
-
-.sidebar p:hover{
-  background:#161a1e;
-  color:#fff;
-}
-
-.main{
-  flex:1;
-  padding:15px;
-}
-
-/* GRID */
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-  gap:15px;
-}
-
+.sidebar h2{color:#f0b90b;}
+.sidebar p{color:#aaa; cursor:pointer;}
+.sidebar p:hover{color:#fff;}
+.main{flex:1; padding:20px; overflow:auto;}
+.grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:15px;}
 .card{
   background:#161a1e;
   padding:15px;
-  border-radius:12px;
-  box-shadow:0 0 12px rgba(0,0,0,0.4);
+  border-radius:10px;
   transition:0.2s;
 }
-
-.card:hover{
-  transform:translateY(-2px);
-}
-
-.price{
-  font-size:30px;
-  font-weight:bold;
-  color:#f0b90b;
-}
-
-.green{color:#0ecb81;}
-.red{color:#f6465d;}
-
+.card:hover{transform:translateY(-2px);}
+.price{font-size:28px; color:#f0b90b; font-weight:bold;}
 input{
-  width:100%;
-  padding:10px;
-  margin-top:10px;
-  border:none;
-  border-radius:6px;
-  background:#0b0e11;
-  color:#fff;
+  width:100%; padding:10px; margin-top:10px;
+  background:#0b0e11; border:none; color:#fff; border-radius:6px;
 }
-
 button{
-  padding:10px;
-  border:none;
-  border-radius:6px;
-  cursor:pointer;
+  width:48%; padding:10px; margin-top:10px;
+  border:none; border-radius:6px; cursor:pointer;
   font-weight:bold;
-  transition:0.2s;
 }
-
-button:hover{opacity:0.85;}
-
-.buy{background:#0ecb81;color:#000; width:48%;}
-.sell{background:#f6465d;color:#fff; width:48%;}
-
-canvas{
-  width:100%;
-  height:220px;
-  background:#0b0e11;
-  border-radius:10px;
+.buy{background:#0ecb81; color:#000;}
+.sell{background:#f6465d; color:#fff;}
+canvas{width:100%; height:220px; background:#0b0e11; border-radius:10px;}
+.login{
+  height:100vh; display:flex; align-items:center; justify-content:center;
 }
-
-/* LOGIN */
-#loginPage{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  height:100vh;
+.box{
+  background:#161a1e; padding:25px; border-radius:10px; width:300px;
 }
-
-.login-box{
-  background:#161a1e;
-  padding:25px;
-  border-radius:10px;
-  width:300px;
-}
-
-.login-box h2{
-  text-align:center;
-  color:#f0b90b;
-}
-
-</style></head>
-<body><!-- LOGIN --><div id="loginPage">
-  <div class="login-box">
-    <h2>ProWallet Pro</h2>
-    <input id="username" placeholder="Username" />
-    <input id="password" type="password" placeholder="Password" />
-    <button style="width:100%;margin-top:10px;background:#f0b90b;" onclick="login()">Login</button>
+</style>
+</head>
+<body><div id="loginPage" class="login">
+  <div class="box">
+    <h2>ProWallet Login</h2>
+    <input id="username" placeholder="Username">
+    <input id="password" type="password" placeholder="Password">
+    <button style="width:100%" onclick="login()">Login</button>
   </div>
-</div><!-- APP --><div id="app" style="display:none;"><header>
-  <div class="logo">⚡ PROWALLET PRO</div>
+</div><div id="app" style="display:none;">
+<header>
+  <div>⚡ ProWallet Exchange PRO</div>
   <div>
     <span id="user"></span>
-    <button onclick="logout()" style="margin-left:10px;background:#f6465d;color:#fff;">Logout</button>
+    <button onclick="logout()">Logout</button>
   </div>
-</header><div class="container"><!-- SIDEBAR --><div class="sidebar">
-  <h3>Market</h3>
-  <p>Dashboard</p>
-  <p>Trade</p>
-  <p>Portfolio</p>
-</div><!-- MAIN --><div class="main"><div class="grid"><div class="card">
+</header><div class="container"><div class="sidebar">
+<h2>Market</h2>
+<p>Dashboard</p>
+<p>Trade</p>
+<p>Portfolio</p>
+</div><div class="main"><div class="grid"><div class="card">
   <div>BTC/USDT</div>
   <div id="price" class="price">$0</div>
-  <small id="status">Live Market</small>
 </div><div class="card">
   <h3>Portfolio</h3>
   USD: $<span id="usd">0</span><br>
@@ -169,131 +87,132 @@ canvas{
   Total: $<span id="total">0</span>
 </div><div class="card">
   <h3>Trade</h3>
-  <input id="amount" placeholder="USD amount" />
-  <div style="display:flex;justify-content:space-between;">
+  <input id="amount" placeholder="USD amount">
+  <div style="display:flex; justify-content:space-between;">
     <button class="buy" onclick="buy()">BUY</button>
     <button class="sell" onclick="sell()">SELL</button>
   </div>
 </div><div class="card">
-  <h3>Live Chart</h3>
+  <h3>Chart (Live)</h3>
   <canvas id="chart"></canvas>
 </div><div class="card">
   <h3>History</h3>
   <div id="history"></div>
-</div></div></div>
+</div></div>
+</div>
 </div><script>
-let price = 76000;
-let chartData = [];
-let interval;
+let price=0;
+let chart=[];
 
-window.addEventListener("load", ()=>{
-  if(localStorage.getItem("user")) showApp();
-});
+async function fetchPrice(){
+  try{
+    let r=await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd");
+    let d=await r.json();
+    price=d.bitcoin.usd;
+  }catch(e){
+    price += (Math.random()-0.5)*100;
+  }
+}
 
 function login(){
   let u=document.getElementById("username").value;
-  if(!u) return alert("Enter username");
-
+  if(!u) return;
   localStorage.setItem("user",u);
-
   if(!localStorage.getItem("usd")){
     localStorage.setItem("usd","1000");
     localStorage.setItem("btc","0");
   }
-
-  showApp();
+  show();
 }
 
-function showApp(){
+function show(){
   document.getElementById("loginPage").style.display="none";
   document.getElementById("app").style.display="block";
-
   document.getElementById("user").innerText=localStorage.getItem("user");
-
-  clearInterval(interval);
-  interval=setInterval(update,1500);
-
-  update();
+  setInterval(update,1500);
 }
 
 function logout(){
-  localStorage.removeItem("user");
-  clearInterval(interval);
-  location.reload();
+  localStorage.clear(); location.reload();
 }
 
 function update(){
-  price += (Math.random()-0.5)*250;
-  price = Math.max(1000,price);
-
-  chartData.push(price);
-  if(chartData.length>40) chartData.shift();
+  fetchPrice();
+  chart.push(price);
+  if(chart.length>40) chart.shift();
 
   document.getElementById("price").innerText="$"+price.toFixed(2);
 
-  portfolio();
-  drawChart();
-}
-
-function portfolio(){
-  let usd=+localStorage.getItem("usd")||0;
-  let btc=+localStorage.getItem("btc")||0;
+  let usd=+localStorage.getItem("usd");
+  let btc=+localStorage.getItem("btc");
 
   let total=usd+btc*price;
 
   document.getElementById("usd").innerText=usd.toFixed(2);
   document.getElementById("btc").innerText=btc.toFixed(6);
   document.getElementById("total").innerText=total.toFixed(2);
+
+  draw();
 }
 
 function buy(){
   let amt=+document.getElementById("amount").value;
-  let usd=+localStorage.getItem("usd")||0;
-  let btc=+localStorage.getItem("btc")||0;
+  let usd=+localStorage.getItem("usd");
+  let btc=+localStorage.getItem("btc");
 
-  if(amt>usd) return alert("Not enough USD");
+  if(amt>usd) return alert("No USD");
 
   usd-=amt;
   btc+=amt/price;
 
   localStorage.setItem("usd",usd);
   localStorage.setItem("btc",btc);
+
+  history("BUY",amt);
 }
 
 function sell(){
   let amt=+document.getElementById("amount").value;
-  let usd=+localStorage.getItem("usd")||0;
-  let btc=+localStorage.getItem("btc")||0;
+  let usd=+localStorage.getItem("usd");
+  let btc=+localStorage.getItem("btc");
 
   let b=amt/price;
-  if(b>btc) return alert("Not enough BTC");
+  if(b>btc) return alert("No BTC");
 
   btc-=b;
   usd+=amt;
 
   localStorage.setItem("usd",usd);
   localStorage.setItem("btc",btc);
+
+  history("SELL",amt);
 }
 
-function drawChart(){
+function history(t,a){
+  let h=JSON.parse(localStorage.getItem("h")||"[]");
+  h.unshift({t,a,p:price.toFixed(2)});
+  localStorage.setItem("h",JSON.stringify(h));
+
+  document.getElementById("history").innerHTML=
+    h.map(x=>`${x.t} $${x.a} @ ${x.p}`).join("<br>");
+}
+
+function draw(){
   let c=document.getElementById("chart");
   let ctx=c.getContext("2d");
-
   c.width=c.clientWidth;
   c.height=220;
 
   ctx.clearRect(0,0,c.width,c.height);
   ctx.beginPath();
 
-  let max=Math.max(...chartData);
-  let min=Math.min(...chartData);
+  let max=Math.max(...chart);
+  let min=Math.min(...chart);
 
-  chartData.forEach((p,i)=>{
-    let x=(i/chartData.length)*c.width;
-    let y=c.height-((p-min)/(max-min))*c.height;
-
-    if(i===0) ctx.moveTo(x,y);
-    else ctx.lineTo(x,y);
+  chart.forEach((v,i)=>{
+    let x=(i/chart.length)*c.width;
+    let y=c.height-((v-min)/(max-min))*c.height;
+    i?ctx.lineTo(x,y):ctx.moveTo(x,y);
   });
 
   ctx.strokeStyle="#f0b90b";
