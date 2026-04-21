@@ -3,40 +3,42 @@ const http = require("http");
 const WebSocket = require("ws");
 const cors = require("cors");
 const path = require("path");
+
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "public")));
+
+/* =========================
+   🌐 FRONTEND (FIXED)
+========================= */
+app.use(express.static(__dirname));
 
 app.get("/", (req, res) => {
-  res.redirect("/login.html");
+  res.sendFile(path.join(__dirname, "index.html"));
 });
+
+/* =========================
+   🚀 SERVER
+========================= */
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
 /* =========================
-   🧠 ORDER BOOK (CORE ENGINE)
+   🧠 ORDER BOOK
 ========================= */
-
-let orderBook = {
-  buy: [],   // bids
-  sell: []   // asks
-};
-
+let orderBook = { buy: [], sell: [] };
 let trades = [];
 
 /* =========================
-   💰 USERS WALLET
+   💰 WALLETS
 ========================= */
-
 let wallets = {
   user1: { usd: 1000, btc: 0 }
 };
 
 /* =========================
-   📡 WEBSOCKET CONNECTIONS
+   📡 BROADCAST
 ========================= */
-
 function broadcast(data) {
   wss.clients.forEach(client => {
     if (client.readyState === WebSocket.OPEN) {
@@ -46,9 +48,8 @@ function broadcast(data) {
 }
 
 /* =========================
-   🔥 MATCHING ENGINE
+   🔥 MATCH ENGINE
 ========================= */
-
 function matchOrders() {
   orderBook.buy.sort((a, b) => b.price - a.price);
   orderBook.sell.sort((a, b) => a.price - b.price);
@@ -61,8 +62,10 @@ function matchOrders() {
       let qty = Math.min(buy.amount, sell.amount);
       let price = sell.price;
 
-      // execute trade
       trades.push({ price, qty, time: Date.now() });
+
+      if (!wallets[buy.user]) wallets[buy.user] = { usd: 1000, btc: 0 };
+      if (!wallets[sell.user]) wallets[sell.user] = { usd: 1000, btc: 0 };
 
       wallets[buy.user].usd -= qty * price;
       wallets[buy.user].btc += qty;
@@ -73,14 +76,10 @@ function matchOrders() {
       buy.amount -= qty;
       sell.amount -= qty;
 
-      if (buy.amount === 0) orderBook.buy.shift();
-      if (sell.amount === 0) orderBook.sell.shift();
+      if (buy.amount <= 0) orderBook.buy.shift();
+      if (sell.amount <= 0) orderBook.sell.shift();
 
-      broadcast({
-        type: "trade",
-        price,
-        qty
-      });
+      broadcast({ type: "trade", price, qty });
 
     } else {
       break;
@@ -89,9 +88,8 @@ function matchOrders() {
 }
 
 /* =========================
-   📥 PLACE ORDER API
+   📥 ORDER API
 ========================= */
-
 app.post("/order", (req, res) => {
   const { user, type, price, amount } = req.body;
 
@@ -101,11 +99,8 @@ app.post("/order", (req, res) => {
 
   const order = { user, price, amount };
 
-  if (type === "buy") {
-    orderBook.buy.push(order);
-  } else {
-    orderBook.sell.push(order);
-  }
+  if (type === "buy") orderBook.buy.push(order);
+  else orderBook.sell.push(order);
 
   matchOrders();
 
@@ -118,9 +113,8 @@ app.post("/order", (req, res) => {
 });
 
 /* =========================
-   📊 GET ORDER BOOK
+   📊 ORDERBOOK
 ========================= */
-
 app.get("/orderbook", (req, res) => {
   res.json(orderBook);
 });
@@ -128,7 +122,6 @@ app.get("/orderbook", (req, res) => {
 /* =========================
    💰 WALLET
 ========================= */
-
 app.get("/wallet/:user", (req, res) => {
   const user = req.params.user;
 
@@ -140,9 +133,8 @@ app.get("/wallet/:user", (req, res) => {
 });
 
 /* =========================
-   📈 MARKET PRICE (FAKE ENGINE)
+   📈 FAKE PRICE
 ========================= */
-
 let price = 76000;
 
 setInterval(() => {
@@ -152,13 +144,11 @@ setInterval(() => {
     type: "price",
     price: price.toFixed(2)
   });
-
 }, 2000);
 
 /* =========================
    🌐 WEBSOCKET
 ========================= */
-
 wss.on("connection", (ws) => {
   ws.send(JSON.stringify({
     type: "init",
@@ -171,7 +161,6 @@ wss.on("connection", (ws) => {
 /* =========================
    🚀 START SERVER
 ========================= */
-
 server.listen(3000, () => {
-  console.log("🔥 Exchange backend running on http://localhost:3000");
+  console.log("🔥 PROWALLET RUNNING: http://127.0.0.1:3000");
 });
