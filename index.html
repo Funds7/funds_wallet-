@@ -2,7 +2,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ProWallet Exchange (Pro Level)</title>
+<title>ProWallet Binance Clone (Level 2.5)</title>
 <style>
 body{
   margin:0;
@@ -14,7 +14,7 @@ header{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  padding:12px 20px;
+  padding:12px 18px;
   background:#161a1e;
   border-bottom:1px solid #222;
 }
@@ -23,63 +23,55 @@ header{
   width:220px;
   background:#0b0e11;
   border-right:1px solid #222;
-  padding:20px;
+  padding:15px;
 }
 .sidebar h2{color:#f0b90b;}
 .sidebar p{color:#aaa; cursor:pointer;}
 .sidebar p:hover{color:#fff;}
-.main{flex:1; padding:20px; overflow:auto;}
-.grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:15px;}
-.card{
-  background:#161a1e;
-  padding:15px;
-  border-radius:10px;
-  transition:0.2s;
-}
-.card:hover{transform:translateY(-2px);}
-.price{font-size:28px; color:#f0b90b; font-weight:bold;}
-input{
-  width:100%; padding:10px; margin-top:10px;
-  background:#0b0e11; border:none; color:#fff; border-radius:6px;
-}
-button{
-  width:48%; padding:10px; margin-top:10px;
-  border:none; border-radius:6px; cursor:pointer;
-  font-weight:bold;
-}
+.main{flex:1; padding:15px; overflow:auto;}
+.grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:12px;}
+.card{background:#161a1e; padding:12px; border-radius:10px; border:1px solid #222;}
+.price{font-size:26px; color:#f0b90b; font-weight:bold;}
+input{width:100%; padding:10px; margin-top:8px; background:#0b0e11; border:1px solid #222; color:#fff; border-radius:6px;}
+button{width:48%; padding:10px; margin-top:10px; border:none; border-radius:6px; font-weight:bold; cursor:pointer;}
 .buy{background:#0ecb81; color:#000;}
 .sell{background:#f6465d; color:#fff;}
-canvas{width:100%; height:220px; background:#0b0e11; border-radius:10px;}
-.login{
-  height:100vh; display:flex; align-items:center; justify-content:center;
-}
-.box{
-  background:#161a1e; padding:25px; border-radius:10px; width:300px;
-}
+.table{font-size:12px;}
+.row{display:flex; justify-content:space-between; padding:2px 0;}
+.asks .row{color:#f6465d;}
+.bids .row{color:#0ecb81;}
+canvas{width:100%; height:220px; background:#0b0e11;}
+.login{height:100vh; display:flex; align-items:center; justify-content:center;}
+.box{background:#161a1e; padding:25px; border-radius:10px; width:300px;}
 </style>
 </head>
 <body><div id="loginPage" class="login">
   <div class="box">
-    <h2>ProWallet Login</h2>
+    <h2>ProWallet Clone</h2>
     <input id="username" placeholder="Username">
     <input id="password" type="password" placeholder="Password">
     <button style="width:100%" onclick="login()">Login</button>
   </div>
 </div><div id="app" style="display:none;">
 <header>
-  <div>⚡ ProWallet Exchange PRO</div>
+  <div>⚡ ProWallet Binance Clone L2</div>
   <div>
     <span id="user"></span>
     <button onclick="logout()">Logout</button>
   </div>
 </header><div class="container"><div class="sidebar">
 <h2>Market</h2>
-<p>Dashboard</p>
-<p>Trade</p>
+<p>BTC/USDT</p>
 <p>Portfolio</p>
 </div><div class="main"><div class="grid"><div class="card">
   <div>BTC/USDT</div>
-  <div id="price" class="price">$0</div>
+  <div id="price" class="price">Loading...</div>
+</div><div class="card">
+  <h3>Order Book</h3>
+  <div style="display:flex; gap:10px;">
+    <div class="table bids" id="bids"></div>
+    <div class="table asks" id="asks"></div>
+  </div>
 </div><div class="card">
   <h3>Portfolio</h3>
   USD: $<span id="usd">0</span><br>
@@ -93,35 +85,45 @@ canvas{width:100%; height:220px; background:#0b0e11; border-radius:10px;}
     <button class="sell" onclick="sell()">SELL</button>
   </div>
 </div><div class="card">
-  <h3>Chart (Live)</h3>
+  <h3>Chart</h3>
   <canvas id="chart"></canvas>
-</div><div class="card">
-  <h3>History</h3>
-  <div id="history"></div>
 </div></div>
 </div>
 </div><script>
 let price=0;
 let chart=[];
+let bids=[];
+let asks=[];
+let ws;
 
-async function fetchPrice(){
-  try{
-    let r=await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd");
-    let d=await r.json();
-    price=d.bitcoin.usd;
-  }catch(e){
-    price += (Math.random()-0.5)*100;
-  }
+function connect(){
+  ws=new WebSocket("wss://stream.binance.com:9443/ws/btcusdt@trade");
+
+  ws.onmessage=(e)=>{
+    let d=JSON.parse(e.data);
+    price=parseFloat(d.p);
+  };
+
+  ws.onerror=()=>fallback();
+}
+
+function fallback(){
+  setInterval(()=>{
+    price+=(Math.random()-0.5)*80;
+  },1000);
 }
 
 function login(){
   let u=document.getElementById("username").value;
   if(!u) return;
+
   localStorage.setItem("user",u);
+
   if(!localStorage.getItem("usd")){
     localStorage.setItem("usd","1000");
     localStorage.setItem("btc","0");
   }
+
   show();
 }
 
@@ -129,30 +131,32 @@ function show(){
   document.getElementById("loginPage").style.display="none";
   document.getElementById("app").style.display="block";
   document.getElementById("user").innerText=localStorage.getItem("user");
-  setInterval(update,1500);
+
+  connect();
+  setInterval(update,1000);
 }
 
-function logout(){
-  localStorage.clear(); location.reload();
-}
+function logout(){localStorage.clear();location.reload();}
 
 function update(){
-  fetchPrice();
   chart.push(price);
-  if(chart.length>40) chart.shift();
+  if(chart.length>60) chart.shift();
 
   document.getElementById("price").innerText="$"+price.toFixed(2);
 
+  portfolio();
+  draw();
+  orderBook();
+}
+
+function portfolio(){
   let usd=+localStorage.getItem("usd");
   let btc=+localStorage.getItem("btc");
-
   let total=usd+btc*price;
 
   document.getElementById("usd").innerText=usd.toFixed(2);
   document.getElementById("btc").innerText=btc.toFixed(6);
   document.getElementById("total").innerText=total.toFixed(2);
-
-  draw();
 }
 
 function buy(){
@@ -168,7 +172,7 @@ function buy(){
   localStorage.setItem("usd",usd);
   localStorage.setItem("btc",btc);
 
-  history("BUY",amt);
+  match("BUY",amt);
 }
 
 function sell(){
@@ -185,21 +189,36 @@ function sell(){
   localStorage.setItem("usd",usd);
   localStorage.setItem("btc",btc);
 
-  history("SELL",amt);
+  match("SELL",amt);
 }
 
-function history(t,a){
-  let h=JSON.parse(localStorage.getItem("h")||"[]");
-  h.unshift({t,a,p:price.toFixed(2)});
-  localStorage.setItem("h",JSON.stringify(h));
+// SIMPLE ORDER MATCH ENGINE (SIMULATED)
+function match(type,amt){
+  let order={type,amt,price:price.toFixed(2)};
 
-  document.getElementById("history").innerHTML=
-    h.map(x=>`${x.t} $${x.a} @ ${x.p}`).join("<br>");
+  if(type=="BUY") bids.unshift(order);
+  else asks.unshift(order);
+
+  if(bids.length>6) bids.pop();
+  if(asks.length>6) asks.pop();
+
+  orderBook();
+}
+
+function orderBook(){
+  let b="",a="";
+
+  bids.forEach(x=>b+=`<div class='row'>${x.amt}$ @ ${x.price}</div>`);
+  asks.forEach(x=>a+=`<div class='row'>${x.amt}$ @ ${x.price}</div>`);
+
+  document.getElementById("bids").innerHTML=b;
+  document.getElementById("asks").innerHTML=a;
 }
 
 function draw(){
   let c=document.getElementById("chart");
   let ctx=c.getContext("2d");
+
   c.width=c.clientWidth;
   c.height=220;
 
@@ -209,9 +228,12 @@ function draw(){
   let max=Math.max(...chart);
   let min=Math.min(...chart);
 
+  if(max==min) return;
+
   chart.forEach((v,i)=>{
     let x=(i/chart.length)*c.width;
     let y=c.height-((v-min)/(max-min))*c.height;
+
     i?ctx.lineTo(x,y):ctx.moveTo(x,y);
   });
 
