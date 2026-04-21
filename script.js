@@ -42,14 +42,18 @@ function showApp() {
   document.getElementById("user").innerText =
     localStorage.getItem("user") || "Guest";
 
+  document.getElementById("price").innerText = "Loading...";
+
   clearInterval(priceInterval);
   clearInterval(portfolioInterval);
 
-  updatePrices();
-  updatePortfolio();
+  updatePrices().then(updatePortfolio);
   loadChat();
 
-  priceInterval = setInterval(updatePrices, 4000);
+  priceInterval = setInterval(() => {
+    updatePrices().then(updatePortfolio);
+  }, 5000);
+
   portfolioInterval = setInterval(updatePortfolio, 2000);
 }
 
@@ -64,18 +68,26 @@ function logout() {
 }
 
 // ================= PRICES =================
-function updatePrices() {
-  prices.BTC += (Math.random() - 0.5) * 200;
-  prices.ETH += (Math.random() - 0.5) * 10;
+async function updatePrices() {
+  try {
+    const res = await fetch(
+      "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd"
+    );
 
-  prices.BTC = Math.max(1000, prices.BTC);
-  prices.ETH = Math.max(50, prices.ETH);
+    const data = await res.json();
 
-  const btcEl = document.getElementById("price");
-  const ethEl = document.getElementById("ethPrice");
+    prices.BTC = data.bitcoin.usd;
+    prices.ETH = data.ethereum.usd;
 
-  if (btcEl) btcEl.innerText = "BTC: $" + prices.BTC.toFixed(2);
-  if (ethEl) ethEl.innerText = "ETH: $" + prices.ETH.toFixed(2);
+    const btcEl = document.getElementById("price");
+    const ethEl = document.getElementById("ethPrice");
+
+    if (btcEl) btcEl.innerText = "BTC: $" + prices.BTC.toFixed(2);
+    if (ethEl) ethEl.innerText = "ETH: $" + prices.ETH.toFixed(2);
+
+  } catch (err) {
+    console.log("API failed, keeping last price");
+  }
 }
 
 // ================= PORTFOLIO =================
@@ -88,14 +100,12 @@ function updatePortfolio() {
 
   if (!isFinite(total)) total = 0;
 
-  const usdEl = document.getElementById("balance");
-  const btcEl = document.getElementById("btcHold");
-  const ethEl = document.getElementById("ethHold");
-  const totalEl = document.getElementById("totalValue");
+  const usdEl = document.getElementById("usd");
+  const btcEl = document.getElementById("btc");
+  const totalEl = document.getElementById("total");
 
   if (usdEl) usdEl.innerText = usd.toFixed(2);
-  if (btcEl) btcEl.innerText = btc.toFixed(8);
-  if (ethEl) ethEl.innerText = eth.toFixed(6);
+  if (btcEl) btcEl.innerText = btc.toFixed(6);
   if (totalEl) totalEl.innerText = total.toFixed(2);
 }
 
