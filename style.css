@@ -1,63 +1,31 @@
-body{
-  margin:0;
-  font-family:Arial;
-  background:#0b0f1a;
-  color:white;
+body {
+  font-family: Arial;
+  background: #0b0f1a;
+  color: white;
+  text-align: center;
+  margin: 0;
+  padding: 20px;
 }
 
-.layout{
-  display:flex;
+.box {
+  margin-top: 100px;
 }
 
-/* SIDEBAR */
-.sidebar{
-  width:220px;
-  background:#121a2a;
-  padding:20px;
-  height:100vh;
+input {
+  padding: 10px;
+  width: 200px;
+  margin: 10px;
 }
 
-/* MAIN */
-.main{
-  flex:1;
-  padding:20px;
+button {
+  padding: 10px 20px;
+  cursor: pointer;
 }
 
-.card{
-  background:#121a2a;
-  padding:15px;
-  margin:10px 0;
-  border-radius:10px;
-}
-
-/* GRID */
-.grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:10px;
-}
-
-/* BUTTONS */
-button{
-  padding:10px;
-  border:none;
-  border-radius:5px;
-  cursor:pointer;
-}
-
-.buy{background:green;color:white;}
-.sell{background:red;color:white;}
-
-input{
-  padding:10px;
-  width:90%;
-  margin:10px 0;
-  border-radius:5px;
-  border:none;
-}
-
-/* CHART */
-#chartContainer{
-  height:350px;
-  width:100%;
+.card {
+  background: #1c2333;
+  padding: 20px;
+  margin-top: 20px;
+  display: inline-block;
+  border-radius: 10px;
 }
