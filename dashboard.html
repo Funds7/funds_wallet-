@@ -1,16 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Dashboard</title>
+  <title>ProWallet Dashboard</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h2>Welcome <span id="user"></span></h2>
+<div class="box">
+  <h1>📊 Dashboard</h1>
 
-<div class="card">
-  <h3>BTC Price</h3>
-  <h1 id="price">Loading...</h1>
+  <h2>Welcome, <span id="username"></span></h2>
+
+  <button onclick="logout()">Logout</button>
 </div>
 
 <script src="script.js"></script>
