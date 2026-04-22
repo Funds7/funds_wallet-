@@ -1,10 +1,9 @@
 body {
-  font-family: Arial;
+  margin: 0;
+  font-family: Arial, sans-serif;
   background: #0b0f1a;
   color: white;
   text-align: center;
-  margin: 0;
-  padding: 20px;
 }
 
 .box {
@@ -13,19 +12,13 @@ body {
 
 input {
   padding: 10px;
-  width: 200px;
   margin: 10px;
+  width: 200px;
 }
 
 button {
   padding: 10px 20px;
+  background: #00c2ff;
+  border: none;
   cursor: pointer;
-}
-
-.card {
-  background: #1c2333;
-  padding: 20px;
-  margin-top: 20px;
-  display: inline-block;
-  border-radius: 10px;
 }
