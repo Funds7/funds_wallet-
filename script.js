@@ -6,6 +6,14 @@ function login(){
     return;
   }
 
+  const safeUser = user.replace(/</g, "").replace(/>/g, "");
+
+  localStorage.setItem("user", safeUser);
+  localStorage.setItem("auth", "true");
+
+  window.location.replace("./dashboard.html");
+}
+
   // basic sanitization
   const safeUser = user.replace(/</g, "").replace(/>/g, "");
 
@@ -16,12 +24,17 @@ function login(){
 }
 
 // RUN ON DASHBOARD
-const auth = sessionStorage.getItem("auth");
-const user = sessionStorage.getItem("user");
+window.onload = function(){
+  const auth = localStorage.getItem("auth");
+  const user = localStorage.getItem("user");
 
-if(auth !== "true" || !user){
-  window.location.replace("./index.html");
-  return;
+  if(auth !== "true" || !user){
+    window.location.replace("./index.html");
+    return;
+  }
+
+  const el = document.getElementById("username");
+  if(el) el.innerText = user;
 }
 
   const el = document.getElementById("username");
@@ -30,6 +43,6 @@ if(auth !== "true" || !user){
 
 // LOGOUT
 function logout(){
-  sessionStorage.clear();
-  window.location.href = "./dashboard.html";
+  localStorage.clear();
+  window.location.replace("./index.html");
 }
