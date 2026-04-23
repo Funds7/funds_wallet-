@@ -1,4 +1,3 @@
-<script>
 let balance = 1000;
 let btcOwned = 0;
 let lastBuyPrice = 0;
@@ -8,7 +7,9 @@ async function getBTCPrice() {
   let data = await res.json();
   let price = data.bpi.USD.rate_float;
 
-  document.getElementById("price").innerText = price.toFixed(2);
+  let priceEl = document.getElementById("price");
+  if (priceEl) priceEl.innerText = price.toFixed(2);
+
   return price;
 }
 
@@ -47,17 +48,49 @@ async function sellBTC() {
 }
 
 function updateUI() {
-  document.getElementById("balance").innerText = balance.toFixed(2);
+  let balEl = document.getElementById("balance");
+  if (balEl) balEl.innerText = balance.toFixed(2);
 }
 
 function addHistory(text) {
   let history = document.getElementById("history");
+  if (!history) return;
+
   let item = document.createElement("p");
   item.innerText = text;
   history.prepend(item);
 }
 
-// auto update price every 5 seconds
+// ================= LOGIN SYSTEM =================
+
+function login() {
+  let usernameInput = document.getElementById("usernameInput");
+
+  if (!usernameInput) return;
+
+  let username = usernameInput.value;
+
+  if (username === "") {
+    alert("Enter username");
+    return;
+  }
+
+  localStorage.setItem("user", username);
+  window.location.href = "dashboard.html";
+}
+
+function logout() {
+  localStorage.removeItem("user");
+  window.location.href = "index.html";
+}
+
+// show username on dashboard
+let user = localStorage.getItem("user");
+if (user) {
+  let el = document.getElementById("username");
+  if (el) el.innerText = user;
+}
+
+// auto update price
 setInterval(getBTCPrice, 5000);
 getBTCPrice();
-</script>
