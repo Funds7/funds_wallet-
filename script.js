@@ -1,4 +1,6 @@
 console.log("script loaded");
+
+// LOGIN
 function login(){
   const user = document.getElementById("user").value.trim();
 
@@ -15,32 +17,21 @@ function login(){
   window.location.replace("./dashboard.html");
 }
 
-  // basic sanitization
-  const safeUser = user.replace(/</g, "").replace(/>/g, "");
-
-  sessionStorage.setItem("user", safeUser);
-  sessionStorage.setItem("auth", "true");
-
-  window.location.href = "./dashboard.html";
-}
-
-// RUN ON DASHBOARD
+// DASHBOARD CHECK
 window.onload = function(){
   const auth = localStorage.getItem("auth");
   const user = localStorage.getItem("user");
 
-  if(auth !== "true" || !user){
-    window.location.replace("./index.html");
-    return;
+  if(window.location.pathname.includes("dashboard.html")){
+    if(auth !== "true" || !user){
+      window.location.replace("./index.html");
+      return;
+    }
+
+    const el = document.getElementById("username");
+    if(el) el.innerText = user;
   }
-
-  const el = document.getElementById("username");
-  if(el) el.innerText = user;
-}
-
-  const el = document.getElementById("username");
-  if(el) el.innerText = user;
-}
+};
 
 // LOGOUT
 function logout(){
