@@ -7,7 +7,26 @@
 <body>
 
 <div class="box">
-  <h1>📊 Dashboard</h1>
+  <h1>📊 ProBroker Dashboard</h1>
+
+  <h2>Welcome, <span id="username"></span></h2>
+
+  <hr>
+
+  <h3>💰 Balance: $<span id="balance">1000</span></h3>
+
+  <h3>📈 BTC Price: $<span id="price">Loading...</span></h3>
+
+  <button onclick="buy()">BUY</button>
+  <button onclick="sell()">SELL</button>
+
+  <hr>
+
+  <h3>📜 History</h3>
+  <div id="history"></div>
+
+  <button onclick="logout()">Logout</button>
+</div>
 
   <h2>Welcome, <span id="username"></span></h2>
 
