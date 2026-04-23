@@ -16,14 +16,13 @@ function login(){
 }
 
 // RUN ON DASHBOARD
-window.onload = function(){
-  const auth = sessionStorage.getItem("auth");
-  const user = sessionStorage.getItem("user");
+const auth = sessionStorage.getItem("auth");
+const user = sessionStorage.getItem("user");
 
-  if(!auth || !user){
-    window.location.replace("./index.html");
-    return;
-  }
+if(auth !== "true" || !user){
+  window.location.replace("./index.html");
+  return;
+}
 
   const el = document.getElementById("username");
   if(el) el.innerText = user;
@@ -32,5 +31,5 @@ window.onload = function(){
 // LOGOUT
 function logout(){
   sessionStorage.clear();
-  window.location.replace("./index.html");
+  window.location.href = "./dashboard.html";
 }
