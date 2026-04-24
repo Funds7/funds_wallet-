@@ -174,7 +174,6 @@ window.addEventListener("load", () => {
 
   startTradingBot();
 });
-
 // ================= BOT =================
 function startTradingBot() {
   if (tradingInterval) clearInterval(tradingInterval);
@@ -187,47 +186,42 @@ function startTradingBot() {
 
     let now = Date.now();
 
-    // ⛔ Cooldown: wait 15s after any trade
-    if (now - lastAction < 30000) return;
+    // ⛔ cooldown (important)
+    if (now - lastAction < 45000) return;
 
-    // First price init
+    // init price
     if (lastSeenPrice === 0) {
       lastSeenPrice = price;
       return;
     }
 
-    // 📉 PRICE CHANGE %
-    let priceChange = ((price - lastSeenPrice) / lastSeenPrice) * 100;
+    // smoother trend detection
+    let changeFromLast = ((price - lastSeenPrice) / lastSeenPrice) * 100;
 
-    // ================= ENTRY =================
+    // ================= BUY RULE =================
     if (position.size === 0 && balance >= strategy.tradeAmount) {
 
-      // ✅ Only buy on REAL dip (-0.5% or more)
-      if (priceChange <= -1.0) {
-        console.log("📉 Strong dip detected → BUY");
+      // only buy on STRONG dip
+      if (changeFromLast <= -0.8) {
+        console.log("📉 Dip confirmed → BUY");
 
         lastAction = now;
         await buyBTC();
       }
     }
 
-    // ================= EXIT =================
+    // ================= SELL RULE =================
     else if (position.size > 0) {
 
-      let change =
+      let profitPercent =
         ((price - position.avgPrice) / position.avgPrice) * 100;
 
-      // ✅ Take profit
-      if (change >= strategy.takeProfit) {
-        console.log("💰 Take Profit → SELL");
-
-        lastAction = now;
-        await sellBTC();
-      }
-
-      // ✅ Stop loss
-      else if (change <= -strategy.stopLoss) {
-        console.log("🛑 Stop Loss → SELL");
+      // take profit OR stop loss
+      if (
+        profitPercent >= strategy.takeProfit ||
+        profitPercent <= -strategy.stopLoss
+      ) {
+        console.log("📊 EXIT → SELL");
 
         lastAction = now;
         await sellBTC();
