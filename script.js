@@ -383,3 +383,6 @@ if (lastSeenPrice > 0) {
 
   loop();
 }
+setInterval(() => {
+  actionLock = false;
+}, 5000);
