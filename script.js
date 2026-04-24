@@ -1,18 +1,30 @@
-let strategy = {
-  takeProfit: 1.0,
-  stopLoss: 0.5,
-  tradeAmount: 200
-};
+function safeNumber(value, fallback = 0) {
+  let n = Number(value);
+  return isNaN(n) ? fallback : n;
+}
 
-let balance = Number(localStorage.getItem("balance")) || 1000;
+let balance = safeNumber(localStorage.getItem("balance"), 1000);
 
-let position = JSON.parse(localStorage.getItem("position")) || {
-  size: 0,
-  avgPrice: 0
-};
+let position = (() => {
+  try {
+    let p = JSON.parse(localStorage.getItem("position"));
+    return {
+      size: safeNumber(p?.size),
+      avgPrice: safeNumber(p?.avgPrice)
+    };
+  } catch {
+    return { size: 0, avgPrice: 0 };
+  }
+})();
 
-let historyData = JSON.parse(localStorage.getItem("history")) || [];
-historyData = historyData.slice(0, 50);
+let historyData = (() => {
+  try {
+    let h = JSON.parse(localStorage.getItem("history")) || [];
+    return Array.isArray(h) ? h.slice(0, 50) : [];
+  } catch {
+    return [];
+  }
+})();
 
 let lastAction = 0;
 let lastSeenPrice = 0;
@@ -43,11 +55,20 @@ async function getBTCPrice() {
 
 // ================= BUY =================
 async function buyBTC() {
+  if (actionLock) return;
+  actionLock = true;
+
   let price = await getBTCPrice();
-  if (!price) return;
+  if (!price) {
+    actionLock = false;
+    return;
+  }
 
   let invest = strategy.tradeAmount;
-  if (balance < invest) return;
+  if (balance < invest) {
+    actionLock = false;
+    return;
+  }
 
   let btcBought = invest / price;
 
@@ -61,13 +82,22 @@ async function buyBTC() {
   lastAction = Date.now();
 
   addHistory(`🟢 BUY ${btcBought.toFixed(6)} BTC @ $${price.toFixed(2)}`);
+
   saveData();
+
+  actionLock = false;
 }
 
 // ================= SELL =================
 async function sellBTC() {
+  if (actionLock) return;
+  actionLock = true;
+
   let price = await getBTCPrice();
-  if (!price || position.size <= 0) return;
+  if (!price || position.size <= 0) {
+    actionLock = false;
+    return;
+  }
 
   let amount = position.size;
 
@@ -90,6 +120,8 @@ async function sellBTC() {
   lastAction = Date.now();
 
   saveData();
+
+  actionLock = false;
 }
 
 function deposit() {
@@ -232,12 +264,14 @@ window.addEventListener("load", () => {
 });
 // ================= BOT =================
 function startTradingBot() {
+  if (window.__botRunning) return; // 🛑 prevent duplicates
+  window.__botRunning = true;
+
   if (tradingInterval) clearInterval(tradingInterval);
 
   tradingInterval = setInterval(async () => {
     let price = await getBTCPrice();
 
-    // ❌ safety check FIRST
     if (!price) {
       lastSeenPrice = 0;
       return;
@@ -247,10 +281,8 @@ function startTradingBot() {
 
     let now = Date.now();
 
-    // ⛔ cooldown
     if (now - lastAction < 30000) return;
 
-    // init price
     if (lastSeenPrice === 0) {
       lastSeenPrice = price;
       return;
@@ -258,7 +290,6 @@ function startTradingBot() {
 
     let changeFromLast = ((price - lastSeenPrice) / lastSeenPrice) * 100;
 
-    // ================= BUY RULE =================
     if (position.size === 0 && balance >= strategy.tradeAmount) {
       if (changeFromLast <= -1.2) {
         lastAction = now;
@@ -266,7 +297,6 @@ function startTradingBot() {
       }
     }
 
-    // ================= SELL RULE =================
     else if (position.size > 0) {
       let profitPercent =
         ((price - position.avgPrice) / position.avgPrice) * 100;
