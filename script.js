@@ -12,6 +12,7 @@ let position = JSON.parse(localStorage.getItem("position")) || {
 };
 
 let historyData = JSON.parse(localStorage.getItem("history")) || [];
+historyData = historyData.slice(0, 50);
 
 let lastAction = 0;
 let lastSeenPrice = 0;
