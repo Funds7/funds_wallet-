@@ -2,29 +2,85 @@ body {
   margin: 0;
   font-family: Arial, sans-serif;
   background: #0b0f1a;
-  color: white;
-  text-align: center;
+  color: #eaecef;
 }
 
+/* MAIN LAYOUT */
 .box {
-  margin-top: 100px;
+  max-width: 1000px;
+  margin: 20px auto;
+  padding: 20px;
 }
 
-input {
-  padding: 10px;
-  margin: 10px;
-  width: 200px;
+/* HEADER STYLE */
+h2 {
+  color: #f0b90b;
+  margin-bottom: 10px;
 }
 
+/* CARD STYLE (BINANCE LOOK) */
+h3 {
+  background: #161a25;
+  padding: 12px;
+  border-radius: 10px;
+  margin: 10px 0;
+  border: 1px solid #232a3a;
+}
+
+/* BUTTONS */
 button {
+  padding: 10px 15px;
   margin: 5px;
-  padding: 10px 20px;
-  background: #00c2ff;
   border: none;
-  color: white;
+  border-radius: 8px;
   cursor: pointer;
+  font-weight: bold;
+  transition: 0.2s;
 }
 
-hr {
-  margin: 15px 0;
+button:hover {
+  transform: scale(1.05);
+}
+
+/* BUY BUTTON */
+button:nth-of-type(1) {
+  background: #0ecb81;
+  color: black;
+}
+
+/* SELL BUTTON */
+button:nth-of-type(2) {
+  background: #f6465d;
+  color: white;
+}
+
+/* HISTORY PANEL */
+#history {
+  background: #161a25;
+  padding: 10px;
+  border-radius: 10px;
+  max-height: 250px;
+  overflow-y: auto;
+  border: 1px solid #232a3a;
+}
+
+/* HISTORY ITEMS */
+#history p {
+  padding: 8px;
+  border-bottom: 1px solid #232a3a;
+  font-size: 13px;
+}
+
+/* PRICE HIGHLIGHT */
+#price {
+  color: #f0b90b;
+  font-weight: bold;
+}
+
+/* CHART AREA */
+#chart {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #232a3a;
+  margin-bottom: 10px;
 }
