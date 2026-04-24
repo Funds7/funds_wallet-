@@ -29,7 +29,15 @@ h3 {
   display: flex;
   justify-content: space-between;
 }
+.history-controls {
+  margin-bottom: 10px;
+}
 
+.history-controls button {
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
 /* BUTTONS (UPGRADED MODERN STYLE) */
 button {
   padding: 10px 15px;
@@ -48,7 +56,21 @@ button:hover {
   transform: scale(1.05);
   opacity: 0.9;
 }
+.history-controls button {
+  padding: 6px 10px;
+  font-size: 12px;
+  background: #232a3a;
+  color: #eaecef;
+  border: 1px solid #3b4252;
+  border-radius: 6px;
+  cursor: pointer;
+}
 
+.history-controls button:hover {
+  background: #2c3445;
+  transform: none;
+  opacity: 1;
+}
 /* BUY BUTTON */
 .buy {
   background: #0ecb81;
