@@ -191,9 +191,19 @@ function updateProfitDashboard(price) {
 // ================= HISTORY =================
 function addHistory(text) {
   historyData.unshift(text);
-  if (historyData.length > 50) historyData.pop();
-}
 
+  // keep only last 50
+  historyData = historyData.slice(0, 50);
+
+  localStorage.setItem("history", JSON.stringify(historyData));
+
+  updateUI();
+}
+function resetHistory() {
+  historyData = [];
+  localStorage.removeItem("history");
+  updateUI();
+}
 // ================= LOGIN =================
 function login() {
   let input = document.getElementById("usernameInput");
@@ -225,18 +235,19 @@ function startTradingBot() {
   if (tradingInterval) clearInterval(tradingInterval);
 
   tradingInterval = setInterval(async () => {
-  let price = await getBTCPrice();
+    let price = await getBTCPrice();
 
-  if (!price) {
-    lastSeenPrice = 0;
-    return;
-  }
+    // ❌ safety check FIRST
+    if (!price) {
+      lastSeenPrice = 0;
+      return;
+    }
 
-  updateProfitDashboard(price);
+    updateProfitDashboard(price);
 
     let now = Date.now();
 
-    // ⛔ cooldown (important)
+    // ⛔ cooldown
     if (now - lastAction < 30000) return;
 
     // init price
@@ -245,16 +256,11 @@ function startTradingBot() {
       return;
     }
 
-    // smoother trend detection
     let changeFromLast = ((price - lastSeenPrice) / lastSeenPrice) * 100;
 
     // ================= BUY RULE =================
     if (position.size === 0 && balance >= strategy.tradeAmount) {
-
-      // only buy on STRONG dip
       if (changeFromLast <= -1.2) {
-        console.log("📉 Dip confirmed → BUY");
-
         lastAction = now;
         await buyBTC();
       }
@@ -262,17 +268,13 @@ function startTradingBot() {
 
     // ================= SELL RULE =================
     else if (position.size > 0) {
-
       let profitPercent =
         ((price - position.avgPrice) / position.avgPrice) * 100;
 
-      // take profit OR stop loss
       if (
         profitPercent >= strategy.takeProfit ||
         profitPercent <= -strategy.stopLoss
       ) {
-        console.log("📊 EXIT → SELL");
-
         lastAction = now;
         await sellBTC();
       }
