@@ -112,7 +112,34 @@ function updateUI() {
     });
   }
 }
+function updateProfitDashboard(price) {
+  if (!price || position.size === 0) {
+    let plEl = document.getElementById("profit");
+    if (plEl) plEl.innerText = "0.00";
 
+    let pctEl = document.getElementById("profitPercent");
+    if (pctEl) pctEl.innerText = "0%";
+
+    let totalEl = document.getElementById("totalValue");
+    if (totalEl) totalEl.innerText = balance.toFixed(2);
+
+    return;
+  }
+
+  let entry = position.avgPrice;
+  let change = entry ? ((price - entry) / entry) * 100 : 0;
+
+  let positionValue = position.size * price;
+  let entryValue = position.size * entry;
+
+  let unrealizedPL = positionValue - entryValue;
+
+  let totalValue = balance + positionValue;
+
+  document.getElementById("profit").innerText = unrealizedPL.toFixed(2);
+  document.getElementById("profitPercent").innerText = change.toFixed(2) + "%";
+  document.getElementById("totalValue").innerText = totalValue.toFixed(2);
+}
 // ================= HISTORY =================
 function addHistory(text) {
   historyData.unshift(text);
@@ -150,7 +177,6 @@ window.addEventListener("load", () => {
 
   startTradingBot();
 
-  setInterval(getBTCPrice, 5000);
 });
 
 // ================= TRADING BOT =================
@@ -161,9 +187,11 @@ function startTradingBot() {
     let price = await getBTCPrice();
     if (!price) return;
 
+  updateProfitDashboard(price);
+    
     let now = Date.now();
 
-    if (now - lastAction < 15000) return;
+    if (now - lastAction < 10000) return;
 
     if (lastSeenPrice === 0) {
       lastSeenPrice = price;
