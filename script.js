@@ -1,7 +1,7 @@
 let strategy = {
-  takeProfit: 0.5,
-  stopLoss: 0.3,
-  tradeAmount: 100
+  takeProfit: 1.0,
+  stopLoss: 0.5,
+  tradeAmount: 200
 };
 
 let balance = Number(localStorage.getItem("balance")) || 1000;
@@ -187,31 +187,54 @@ function startTradingBot() {
 
     let now = Date.now();
 
-    if (now - lastAction < 10000) return;
+    // ⛔ Cooldown: wait 15s after any trade
+    if (now - lastAction < 30000) return;
 
+    // First price init
     if (lastSeenPrice === 0) {
       lastSeenPrice = price;
       return;
     }
 
-    if (position.size === 0) {
-      if (price < lastSeenPrice * 0.998) {
+    // 📉 PRICE CHANGE %
+    let priceChange = ((price - lastSeenPrice) / lastSeenPrice) * 100;
+
+    // ================= ENTRY =================
+    if (position.size === 0 && balance >= strategy.tradeAmount) {
+
+      // ✅ Only buy on REAL dip (-0.5% or more)
+      if (priceChange <= -1.0) {
+        console.log("📉 Strong dip detected → BUY");
+
         lastAction = now;
         await buyBTC();
       }
-    } else {
+    }
+
+    // ================= EXIT =================
+    else if (position.size > 0) {
+
       let change =
         ((price - position.avgPrice) / position.avgPrice) * 100;
 
-      if (
-        change >= strategy.takeProfit ||
-        change <= -strategy.stopLoss
-      ) {
+      // ✅ Take profit
+      if (change >= strategy.takeProfit) {
+        console.log("💰 Take Profit → SELL");
+
+        lastAction = now;
+        await sellBTC();
+      }
+
+      // ✅ Stop loss
+      else if (change <= -strategy.stopLoss) {
+        console.log("🛑 Stop Loss → SELL");
+
         lastAction = now;
         await sellBTC();
       }
     }
 
     lastSeenPrice = price;
+
   }, 10000);
-    }
+}
