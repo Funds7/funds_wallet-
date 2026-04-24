@@ -7,16 +7,21 @@ let historyData = JSON.parse(localStorage.getItem("history")) || [];
 // ================= PRICE =================
 async function getBTCPrice() {
   try {
-    let res = await fetch("https://api.coindesk.com/v1/bpi/currentprice/BTC.json");
+    let res = await fetch("https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT");
     let data = await res.json();
-    let price = data.bpi.USD.rate_float;
+
+    let price = parseFloat(data.price);
 
     let el = document.getElementById("price");
     if (el) el.innerText = price.toFixed(2);
 
     return price;
-  } catch {
-    console.log("Price failed");
+
+  } catch (error) {
+    console.log("Price error:", error);
+
+    let el = document.getElementById("price");
+    if (el) el.innerText = "Error";
   }
 }
 
