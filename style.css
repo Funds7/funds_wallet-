@@ -25,6 +25,9 @@ h3 {
   border-radius: 10px;
   margin: 10px 0;
   border: 1px solid #232a3a;
+
+  display: flex;
+  justify-content: space-between;
 }
 
 /* BUTTONS (UPGRADED MODERN STYLE) */
@@ -87,4 +90,20 @@ button:hover {
   overflow: hidden;
   border: 1px solid #232a3a;
   margin-bottom: 10px;
+}
+/* TOTAL VALUE highlight */
+#totalValue {
+  color: #3b82f6;
+  font-weight: bold;
+}
+
+/* PROFIT COLOR (default green) */
+#profit {
+  color: #0ecb81;
+  font-weight: bold;
+}
+
+/* LOSS STATE (we will toggle this in JS later) */
+#profit.negative {
+  color: #f6465d;
 }
