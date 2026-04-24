@@ -28,34 +28,46 @@ async function getBTCPrice() {
 // ================= BUY =================
 async function buyBTC() {
   let price = await getBTCPrice();
-  if (!price || balance <= 0) return alert("Cannot buy");
 
-  btcOwned = balance / price;
+  let investAmount = 100; // fixed trade amount
+
+  if (balance < investAmount) {
+    return alert("Not enough balance");
+  }
+
+  let btc = investAmount / price;
+
+  btcOwned += btc;
+  balance -= investAmount;
+
   lastBuyPrice = price;
-  balance = 0;
 
   saveData();
-  addHistory(`🟢 Bought BTC at $${price.toFixed(2)}`);
+  addHistory(`🟢 Bought BTC ($${investAmount}) at $${price.toFixed(2)}`);
 }
 
 // ================= SELL =================
 async function sellBTC() {
   let price = await getBTCPrice();
-  if (!price || btcOwned <= 0) return alert("No BTC");
 
-  let newBalance = btcOwned * price;
-  let profit = newBalance - (btcOwned * lastBuyPrice);
+  if (btcOwned <= 0) {
+    return alert("No BTC");
+  }
 
-  // update values
-  balance = newBalance;
+  let sellValue = btcOwned * price;
+  let costBasis = btcOwned * lastBuyPrice;
+
+  let profit = sellValue - costBasis;
+
+  balance += sellValue;
   btcOwned = 0;
 
-  // format profit
-  let profitText = profit >= 0 
+  saveData();
+
+  let profitText = profit >= 0
     ? `+$${profit.toFixed(2)}`
     : `-$${Math.abs(profit).toFixed(2)}`;
 
-  saveData();
   addHistory(`🔴 Sold BTC at $${price.toFixed(2)} | P/L: ${profitText}`);
 }
 
