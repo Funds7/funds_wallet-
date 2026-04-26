@@ -109,3 +109,56 @@ async function sellBTC() {
   }
 }
 
+// ================= BOT =================
+async function botLoop() {
+  if (botRunning) return;
+  botRunning = true;
+
+  async function loop() {
+    let price = await getBTCPrice();
+
+    if (price) {
+      updateProfitDashboard(price);
+
+      let now = Date.now();
+
+      if (now - lastAction >= 30000) {
+
+        if (position.size === 0 && balance >= strategy.tradeAmount) {
+          let changeFromLast = 0;
+
+if (lastSeenPrice > 0) {
+  changeFromLast = ((price - lastSeenPrice) / lastSeenPrice) * 100;
+}
+
+          if (changeFromLast <= -1.2) {
+            lastAction = now;
+            await buyBTC();
+          }
+        }
+
+        else if (position.size > 0) {
+          let profitPercent =
+            ((price - position.avgPrice) / position.avgPrice) * 100;
+
+          if (
+            profitPercent >= strategy.takeProfit ||
+            profitPercent <= -strategy.stopLoss
+          ) {
+            lastAction = now;
+            await sellBTC();
+          }
+        }
+
+        lastSeenPrice = price;
+      }
+    }
+
+    setTimeout(loop, 10000);
+  }
+
+  loop();
+}
+setInterval(() => {
+  actionLock = false;
+}, 5000);
